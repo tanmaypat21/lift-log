@@ -22,3 +22,5 @@ body{background:radial-gradient(circle at 94% -6%,#1a2f35 0,transparent 40%),var
 @media(min-width:650px){.catalog-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hero{padding:28px}.home-tiles{gap:14px}}
 @media(max-width:390px){.lift-row{grid-template-columns:47px minmax(0,1fr) auto 30px;gap:6px}.lift-row-art .exercise-figure{width:47px}.lift-row-weight{font-size:14px}.lift-row-meta strong{font-size:12px}.cardio-headline strong{font-size:26px}.cardio-headline button{padding:10px;font-size:12px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+.lift-name-btn{appearance:none;border:0;background:none;color:var(--ink);padding:5px 0;text-align:left;cursor:pointer}.lift-name-btn:focus-visible{outline:2px solid var(--accent);border-radius:8px}.lift-name-btn strong{font-size:14px}
