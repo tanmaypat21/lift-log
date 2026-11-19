@@ -1,8 +1,19 @@
-# Lift Log v0.3 — Workout tracker + guided AI-coach onboarding
+# Lift Log v0.4 — Workout tracker + guided AI-coach onboarding
 
 A local-first, mobile-friendly Progressive Web App for gym loads, rep history, bodyweight check-ins, nutrition-goal starting guidance, and a personalized coaching interview.
 
 **The guided interview and starting recommendations are rule-based. There is no live AI model connected to this app.** A real in-app agent will require a securely hosted API/backend; the next product architecture is described in `AI_AGENT_SPEC.md`.
+
+
+## v0.4 beta changes
+
+- Offline illustrated exercise gallery (24+ movements), search and filters, identify or add exercises.
+- Cleaner Home: workout goal where entered, cardio minutes, target-weight distance and rotating training notes.
+- Progress tab: per-exercise training load and volume trends, timeframe filters, PR and entry history.
+- Cardio tab: manual activity time, distance, heart rate, goal and history. Wearable sync is not available in this web prototype.
+- Friends preview: opt-in shareable weekly summary through your phone share sheet; **no accounts, live groups, friend data, or automatic sharing** yet.
+- Existing data stays under the same browser storage key. Back up from Settings before testing.
+- The Coach remains a rules-based preview, not a live AI agent.
 
 ## What's new in v0.3
 
@@ -39,7 +50,8 @@ To talk with an actual AI now, tap **Copy coaching brief**, then paste the text 
 
 ## Files
 
-- `index.html`, `styles.css`, `app.js` — full editable PWA implementation
+- `index.html`, `styles.css`, `app.js` — original core tracker
+- `v04.css`, `enhancements.js` — modern UI, illustrations, trend chart, cardio and sharing preview
 - `icon.svg`, `sw.js`, `manifest.webmanifest` — installation/offline assets
 - `AI_AGENT_SPEC.md` — agent behavior, data schema, tools, privacy and roadmap
 - `COACH_ROADMAP.md` — original roadmap reference
