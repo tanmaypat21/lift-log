@@ -8,6 +8,7 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="v04.css" />
   <title>Lift Log — Personal Workout Tracker</title>
 </head>
 <body>
@@ -18,15 +19,16 @@
     </header>
     <main id="app" aria-live="polite"></main>
     <nav class="bottomnav" aria-label="Main navigation">
-      <button data-tab="home" class="active"><span>◫</span>Dashboard</button>
-      <button data-tab="exercises"><span>◧</span>Exercises</button>
-      <button data-tab="history"><span>⌁</span>History</button>
+      <button data-tab="home" class="active"><span>⌂</span>Home</button>
+      <button data-tab="exercises"><span>▤</span>Train</button>
+      <button data-tab="history"><span>↗</span>Progress</button>
+      <button data-tab="cardio"><span>♡</span>Cardio</button>
       <button data-tab="coach"><span>✳</span>Coach</button>
-      <button data-tab="settings"><span>⚙</span>Settings</button>
     </nav>
   </div>
   <div id="modalRoot"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="app.js" defer></script>
+  <script src="enhancements.js" defer></script>
 </body>
 </html>
