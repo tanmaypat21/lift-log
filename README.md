@@ -1,3 +1,23 @@
+# Lift Log v0.4 beta — visual exercise discovery, trends and cardio
+
+This beta lives on a development branch until reviewed. It is a local-first PWA; **no real friends feed, wearable integration, or live AI is implemented**.
+
+## What's new
+
+- **Exercise gallery:** 25 common movements with self-contained simplified SVG illustrations, searchable names/equipment, muscle-group filters, and short identifying cues. Add and configure exercises from the gallery.
+- **Strength charts:** compare recorded loads or calculated volume (weight × sets × reps), choose an exercise and date range, and see the best logged load. Multiple logs in one day use the highest value for the chart.
+- **Cardio:** manually log sessions with activity type, time, distance, optional average heart rate and notes. Set an optional weekly minutes goal.
+- **Streamlined home:** quick logs, weekly training summary, conditional goal-weight distance and rotating short training reminders.
+- **Social preview:** share a weekly summary only by explicitly choosing metrics and invoking your phone's share sheet. No account, friend lists, cloud group or automatic upload.
+- **Data preserved:** uses the existing `liftlog.v1` local storage key; no automatic data resets or seeded new workouts. Please export a backup before switching app versions.
+- **Offline update:** changes the service-worker cache from v3 to v4 so updated assets can load on existing installs.
+
+## Current limitations
+
+Fitness band syncing needs a separate permission-based integration. HealthKit cannot be accessed directly by a plain GitHub Pages web app. Full group sharing requires secure authentication, a consent-aware database and users' sharing controls. Exercise drawings are identification aids, not precise biomechanical demonstrations.
+
+---
+
 # Lift Log v0.3 — Workout tracker + guided AI-coach onboarding
 
 A local-first, mobile-friendly Progressive Web App for gym loads, rep history, bodyweight check-ins, nutrition-goal starting guidance, and a personalized coaching interview.
