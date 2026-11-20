@@ -74,6 +74,26 @@
     {
       "path": "assets/exercises/incline-dumbbell-press/start.webp",
       "sha": "8f2f0dc7fedfc5b5d30804cb756b5e61e3d9a4ae"
+    },
+    {
+      "path": "assets/exercises/lat-pulldown/end.webp",
+      "sha": "51f25aa48265da23742aa21c69b7113785241ca2"
+    },
+    {
+      "path": "assets/exercises/lat-pulldown/start.webp",
+      "sha": "5e403cb3ed257decf1b87cbc1716525d299d4031"
+    },
+    {
+      "path": "assets/exercises/lateral-raises/end.webp",
+      "sha": "9807eb96aa51cbbc8d757e18165a50888f5affce"
+    },
+    {
+      "path": "assets/exercises/lateral-raises/start.webp",
+      "sha": "e02326ccb6b5c9db41f30ae5ac7ea40c9dfa7727"
+    },
+    {
+      "path": "assets/exercises/leg-curl/end.webp",
+      "sha": "d52199b96d3b326050bee26fdc044dc45e94baee"
     }
   ]
 }
