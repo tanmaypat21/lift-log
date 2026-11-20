@@ -1,0 +1,59 @@
+{
+  "source": "https://github.com/MarvinNazari/exercise-images",
+  "license": "CC0-1.0",
+  "sourceNotice": "AI-generated reference imagery; not verified exercise coaching",
+  "files": [
+    {
+      "path": "assets/exercises/bench-press/end.webp",
+      "sha": "45a6b58923c6a4bc9a99f9adc7a89515eb92f58d"
+    },
+    {
+      "path": "assets/exercises/bench-press/start.webp",
+      "sha": "d7f6587ad2afaa6c95737ff3c07ca5e37396eac4"
+    },
+    {
+      "path": "assets/exercises/biceps-curl/end.webp",
+      "sha": "e15a58ccef2f78e4daa1804cc4c27988a50f9c85"
+    },
+    {
+      "path": "assets/exercises/biceps-curl/start.webp",
+      "sha": "7ad9c90db04587b5c1b09b71ed1a8e8267ef2b06"
+    },
+    {
+      "path": "assets/exercises/cable-crunch/end.webp",
+      "sha": "80702e917c692dad07c975755438e9f3c5fe7a24"
+    },
+    {
+      "path": "assets/exercises/cable-crunch/start.webp",
+      "sha": "c2ae971bffc5832b581a78c0bf06aeff21e661f0"
+    },
+    {
+      "path": "assets/exercises/calf-raises/end.webp",
+      "sha": "f029b04f27c55e0d38bf863687b8cdabb3724457"
+    },
+    {
+      "path": "assets/exercises/calf-raises/start.webp",
+      "sha": "99dcf8c31f3c717d5e802b4c11f9e2bf93484c11"
+    },
+    {
+      "path": "assets/exercises/dumbbell-lunge/end.webp",
+      "sha": "c482ac29b27e9231ae1b54e0673bf4caeaea8c9e"
+    },
+    {
+      "path": "assets/exercises/dumbbell-lunge/start.webp",
+      "sha": "d54428fcc236df9434b5387eca8c16a1ab3c5e16"
+    },
+    {
+      "path": "assets/exercises/dumbbell-row/end.webp",
+      "sha": "8c36fa3fe371e37389079a1f3b494847b4889abb"
+    },
+    {
+      "path": "assets/exercises/dumbbell-row/start.webp",
+      "sha": "38b94b0914f5d438a378da88eecefe08228dca85"
+    },
+    {
+      "path": "assets/exercises/face-pulls/end.webp",
+      "sha": "d70de9e0f403cc797f7e2525b0a8b3f8af371b18"
+    }
+  ]
+}
