@@ -134,6 +134,26 @@
     {
       "path": "assets/exercises/pec-deck/end.webp",
       "sha": "ff7edb52b5813438e8c687533a6d8fa3340cfc62"
+    },
+    {
+      "path": "assets/exercises/pec-deck/start.webp",
+      "sha": "7755854fb72f5ade04ee4b4e7a5b30236a46adb9"
+    },
+    {
+      "path": "assets/exercises/plank/hold.webp",
+      "sha": "4c23e0a154f41116dd7494a657f7c6b9c59f4409"
+    },
+    {
+      "path": "assets/exercises/pull-up/end.webp",
+      "sha": "52ad8e9272b1232f73ff2b6f05466d4da96f4a75"
+    },
+    {
+      "path": "assets/exercises/pull-up/start.webp",
+      "sha": "7e4998ad07069fcb483707f3e592a1eca52212da"
+    },
+    {
+      "path": "assets/exercises/push-up/end.webp",
+      "sha": "5d3a2259535e01076f3f585375c1d75f239f3709"
     }
   ]
 }
