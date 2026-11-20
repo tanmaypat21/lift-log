@@ -194,6 +194,26 @@
     {
       "path": "assets/exercises/squat/end.webp",
       "sha": "1ab646c160bb1f51c954cd4e753a3ee117615686"
+    },
+    {
+      "path": "assets/exercises/squat/start.webp",
+      "sha": "7ed7329203b2a49f67b2b85ac8b36b4264857311"
+    },
+    {
+      "path": "assets/exercises/standing-calf-raise-machine/end.webp",
+      "sha": "eac65b7818fb63827bc597a321814e86ab688a9c"
+    },
+    {
+      "path": "assets/exercises/standing-calf-raise-machine/start.webp",
+      "sha": "786c0f1d26063cd88045b592ef7f793f98c17cb1"
+    },
+    {
+      "path": "assets/exercises/tricep-pushdowns/end.webp",
+      "sha": "9fd2e3eeaae3db6c31c44683f15d451694e747e8"
+    },
+    {
+      "path": "assets/exercises/tricep-pushdowns/start.webp",
+      "sha": "f550e93d27268f90bca55e258f83d06a93dc77b1"
     }
   ]
 }
