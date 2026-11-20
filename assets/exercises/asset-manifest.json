@@ -114,6 +114,26 @@
     {
       "path": "assets/exercises/leg-press-calf-raise/start.webp",
       "sha": "17995d8aef152cf502aacf011bb169f5f23a6562"
+    },
+    {
+      "path": "assets/exercises/leg-press/end.webp",
+      "sha": "de75dcf399bf41a3026821c8c245b8902349ec83"
+    },
+    {
+      "path": "assets/exercises/leg-press/start.webp",
+      "sha": "be0ec9c6d2dc3a02633dde96184f0c1121e260d5"
+    },
+    {
+      "path": "assets/exercises/overhead-press/end.webp",
+      "sha": "227717cba733974e94d4ecb18cf1244872382382"
+    },
+    {
+      "path": "assets/exercises/overhead-press/start.webp",
+      "sha": "946888bf9d59c948b5082b0ddf35f8f2a6a894f2"
+    },
+    {
+      "path": "assets/exercises/pec-deck/end.webp",
+      "sha": "ff7edb52b5813438e8c687533a6d8fa3340cfc62"
     }
   ]
 }
