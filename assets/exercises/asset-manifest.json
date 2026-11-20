@@ -94,6 +94,26 @@
     {
       "path": "assets/exercises/leg-curl/end.webp",
       "sha": "d52199b96d3b326050bee26fdc044dc45e94baee"
+    },
+    {
+      "path": "assets/exercises/leg-curl/start.webp",
+      "sha": "00b9781e53c715e9180106facc223644f24f919e"
+    },
+    {
+      "path": "assets/exercises/leg-extension/end.webp",
+      "sha": "068496e48db447af6e5aa8dda242735511662061"
+    },
+    {
+      "path": "assets/exercises/leg-extension/start.webp",
+      "sha": "d0cbbc7e512204fb273699ca1c915185cc1d8cb8"
+    },
+    {
+      "path": "assets/exercises/leg-press-calf-raise/end.webp",
+      "sha": "bde41333c0f06c4aeb8234f3e5ba70b5d96a5aca"
+    },
+    {
+      "path": "assets/exercises/leg-press-calf-raise/start.webp",
+      "sha": "17995d8aef152cf502aacf011bb169f5f23a6562"
     }
   ]
 }
