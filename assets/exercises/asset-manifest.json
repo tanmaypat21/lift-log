@@ -154,6 +154,26 @@
     {
       "path": "assets/exercises/push-up/end.webp",
       "sha": "5d3a2259535e01076f3f585375c1d75f239f3709"
+    },
+    {
+      "path": "assets/exercises/push-up/start.webp",
+      "sha": "db2d24b074410fa001a9dd774ab84704081a1b07"
+    },
+    {
+      "path": "assets/exercises/romanian-deadlift/end.webp",
+      "sha": "cae925fdd99512e7974a5c5534af1a00ed1dfad6"
+    },
+    {
+      "path": "assets/exercises/romanian-deadlift/start.webp",
+      "sha": "d1908e2da20450ad8c52c71af64e393a7f0a6ec3"
+    },
+    {
+      "path": "assets/exercises/seated-cable-row/end.webp",
+      "sha": "9a24d60a1e324484cadcf5e490a1ff09265c4e9f"
+    },
+    {
+      "path": "assets/exercises/seated-cable-row/start.webp",
+      "sha": "6b862b19ae28cce107f879a10c8fa307c4aabe1a"
     }
   ]
 }
