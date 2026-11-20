@@ -54,6 +54,26 @@
     {
       "path": "assets/exercises/face-pulls/end.webp",
       "sha": "d70de9e0f403cc797f7e2525b0a8b3f8af371b18"
+    },
+    {
+      "path": "assets/exercises/face-pulls/start.webp",
+      "sha": "e00ecfaf7680f1e173c6399f4b63f8c8d0b43969"
+    },
+    {
+      "path": "assets/exercises/hip-thrusts/end.webp",
+      "sha": "276a0a4ad9e881a0d291a1cd416c378d9e3f9b06"
+    },
+    {
+      "path": "assets/exercises/hip-thrusts/start.webp",
+      "sha": "bb2f9af628cb565134f4f59ede20d48ad8b42189"
+    },
+    {
+      "path": "assets/exercises/incline-dumbbell-press/end.webp",
+      "sha": "9cb46928023fc462dddcce82b0cc84a825ba1943"
+    },
+    {
+      "path": "assets/exercises/incline-dumbbell-press/start.webp",
+      "sha": "8f2f0dc7fedfc5b5d30804cb756b5e61e3d9a4ae"
     }
   ]
 }
