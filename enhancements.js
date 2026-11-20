@@ -27,8 +27,56 @@
     ['biceps-curl','Biceps Curl','Arms','Dumbbells or barbell','curl','Keep upper arms relatively still.','direct'],
     ['triceps-pushdown','Triceps Pushdown','Arms','Cable + rope/bar','pulldown','Extend the elbows without swinging.','direct'],
     ['plank','Plank','Core','Mat','plank','Hold a comfortable, stable trunk position.','direct'],
-    ['cable-crunch','Cable Crunch','Core','Cable + rope','curl','Flex the trunk slowly and deliberately.','direct']
+    ['cable-crunch','Cable Crunch','Core','Cable + rope','curl','Flex the trunk slowly and deliberately.','direct'],
+    ['standing-calf-raise','Standing Calf Raise','Legs','Standing calf raise machine','calf','Shoulder pads over your shoulders; stand with toes on the step and lift your heels.','direct'],
+    ['seated-calf-raise','Seated Calf Raise','Legs','Seated calf raise machine','calf','Sit with padded resistance across thighs; raise your heels from the foot platform.','direct'],
+    ['leg-press-calf-raise','Leg Press Calf Raise','Legs','Leg press machine','presslegs','Sit in a leg press; keep knees nearly still as the balls of your feet move the sled.','plates']
   ].map(([id,name,category,equipment,pose,cue,loadType]) => ({id,name,category,equipment,pose,cue,loadType}));
+  // Bundled CC0 reference images, from MarvinNazari/exercise-images.
+  // Keep the same exercise IDs: users' existing logs must never be re-labelled automatically.
+  const MEDIA = {
+    'leg-press':'leg-press','calf-raises':'calf-raises','leg-curl':'leg-curl',
+    'seated-leg-curl':'seated-leg-curl','lying-leg-curl':'leg-curl','leg-extension':'leg-extension',
+    'squat':'squat','rdl':'romanian-deadlift','lunge':'dumbbell-lunge','hip-thrust':'hip-thrusts',
+    'bench-press':'bench-press','incline-db-press':'incline-dumbbell-press','chest-fly':'pec-deck',
+    'push-up':'push-up','lat-pulldown':'lat-pulldown','cable-row':'seated-cable-row',
+    'pull-up':'pull-up','db-row':'dumbbell-row','shoulder-press':'overhead-press',
+    'lateral-raise':'lateral-raises','face-pull':'face-pulls','biceps-curl':'biceps-curl',
+    'triceps-pushdown':'tricep-pushdowns','plank':'plank','cable-crunch':'cable-crunch',
+    'standing-calf-raise':'standing-calf-raise-machine',
+    'seated-calf-raise':'seated-calf-raise-machine',
+    'leg-press-calf-raise':'leg-press-calf-raise'
+  };
+  const ALIASES = {
+    'calf-raises':['calves','calf machine','heel raises','toe raises','calf raises'],
+    'standing-calf-raise':['standing calves','standing calf','calf raise machine','standing heel raise','calves machine','machine calves'],
+    'seated-calf-raise':['seated calves','seated calf','seated heel raise','seated calves machine'],
+    'leg-press-calf-raise':['leg press calves','calves on leg press','calf press','toe press','leg press calf','calf raises on leg press'],
+    'leg-curl':['hamstring curl','ham curl','hamstring leg curl','leg curls','hamstrings machine'],
+    'seated-leg-curl':['seated hamstring curl','seated ham curls','sitting leg curl'],
+    'lying-leg-curl':['prone leg curl','lying hamstring curl','face down leg curl'],
+    'leg-extension':['quad extension','knee extension','quads machine'],
+    'leg-press':['leg press machine','sitting leg press','leg press sled'],
+    'squat':['back squat','barbell back squat'],
+    'rdl':['rdl','romanian deadlift','barbell rdl','hip hinge'],
+    'lunge':['walking lunges','dumbbell lunges','lunges'],
+    'hip-thrust':['barbell hip thrust','glute bridge','hip thrusts'],
+    'bench-press':['bench','chest press barbell','barbell bench'],
+    'incline-db-press':['incline dumbbell bench','incline chest press','incline db press'],
+    'chest-fly':['pec deck','butterfly machine','chest fly machine'],
+    'push-up':['pushups','push ups','press ups'],
+    'lat-pulldown':['lat pull down','lat pull','pulldowns','pull down machine'],
+    'cable-row':['seated row','cable rows','rowing machine cables'],
+    'pull-up':['pullups','chin ups','pull up bar'],
+    'db-row':['single arm row','one arm row','dumbbell rows'],
+    'shoulder-press':['overhead press','military press','shoulder press machine'],
+    'lateral-raise':['side raises','side lateral raise','dumbbell lateral raise'],
+    'face-pull':['face pulls','rear delt cable pull'],
+    'biceps-curl':['arm curl','bicep curl','dumbbell curl','bicep curls'],
+    'triceps-pushdown':['tricep pushdown','cable tricep extension','triceps cable pushdown'],
+    'plank':['front plank','ab plank'],
+    'cable-crunch':['kneeling cable crunch','rope crunch']
+  };
   const POSES = {
     presslegs:{head:[45,47],body:'M43 57 L65 75 L86 68 M65 75 L92 44 L112 37 M65 75 L80 88',gear:'<path d="M118 20l19 32M111 30l20 12M15 93h60M66 87l-22 10"/>'},
     calf:{head:[76,25],body:'M76 34 L75 65 L67 87 L67 96 M75 65 L89 87 L94 94 M75 43 L56 55 M75 43 L95 55',gear:'<path d="M55 99h60M54 56h7M91 56h11"/>'},
@@ -54,14 +102,20 @@
   const $ = (s,root=document) => root.querySelector(s);
   function mark(){if(!Array.isArray(data.cardio))data.cardio=[];if(!data.sharePrefs||typeof data.sharePrefs!=='object')data.sharePrefs={workouts:false,cardio:false,records:false}; if(typeof data.cardioGoal!=='number')data.cardioGoal=0;}
   mark();
+  function mediaPath(id,frame='start') { return `./assets/exercises/${id}/${frame}.webp`; }
   function figure(ex,large=false){
-    const p=POSES[ex.pose]||POSES.curl; const ink=cateColor[ex.category]||'#9cf4af';
-    return `<svg class="exercise-figure${large?' large':''}" viewBox="0 0 160 112" role="img" aria-label="Simplified illustration of ${esc(ex.name)}">
-      <rect x="0" y="0" width="160" height="112" rx="15" fill="#1d2b3d"/>
-      <circle cx="132" cy="22" r="31" fill="${ink}" fill-opacity=".06"/>
-      <g fill="none" stroke="#667c93" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">${p.gear}</g>
-      <g fill="none" stroke="${ink}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><circle cx="${p.head[0]}" cy="${p.head[1]}" r="8" stroke-width="5"/><path d="${p.body}"/></g>
-    </svg>`;
+    const id=MEDIA[ex.id];
+    if(!id){return `<div class="exercise-visual visual-fallback" role="img" aria-label="No reference image for ${esc(ex.name)}"><span aria-hidden="true">${esc(categoryIcon(ex.category))}</span><small>Custom exercise</small></div>`;}
+    if(ex.id==='calf-raises'){
+      const parts=[['standing-calf-raise-machine','Standing'],['seated-calf-raise-machine','Seated'],['leg-press-calf-raise','Leg press']];
+      return `<div class="exercise-visual calf-variations ${large?'is-large':''}" role="group" aria-label="Three different calf raise variations">${parts.map(([source,label])=>`<div><img src="${mediaPath(source)}" alt="${esc(label)} calf raise example" loading="lazy" decoding="async"/><small>${esc(label)}</small></div>`).join('')}</div>`;
+    }
+    const hold=id==='plank',first=hold?'hold':'start';
+    if(!large){return `<div class="exercise-visual" role="img" aria-label="${esc(ex.name)} reference illustration"><img src="${mediaPath(id,first)}" alt="" loading="lazy" decoding="async"/><span class="visual-indicator" aria-hidden="true">${hold?'Hold':'View movement'}</span></div>`;}
+    return `<div class="exercise-motion-frames" role="group" aria-label="${esc(ex.name)} movement illustrations">
+       <figure><img src="${mediaPath(id,first)}" alt="${esc(ex.name)} ${hold?'hold':'starting position'}" loading="eager"/><figcaption>${hold?'Position':'Start'}</figcaption></figure>
+       ${hold?'':`<span class="motion-arrow" aria-hidden="true">→</span><figure><img src="${mediaPath(id,'end')}" alt="${esc(ex.name)} finishing position" loading="eager"/><figcaption>Finish</figcaption></figure>`}
+     </div>`;
   }
   function lookup(ex){return CATALOG.find(c=>c.id===ex.catalogId || c.id===ex.id || c.name.toLowerCase()===ex.name.toLowerCase())||{...ex,pose:'curl',equipment:'Custom exercise',cue:'Your own exercise setup'};}
   function row(ex){const r=recent(ex.id),wt=r?Number(r.weight):exerciseLoad(ex),art=lookup(ex);return `<article class="lift-row"><div class="lift-row-art">${figure(art)}</div><button type="button" class="lift-row-meta lift-name-btn" data-edit="${esc(ex.id)}" aria-label="Edit ${esc(ex.name)} configuration"><strong>${esc(ex.name)}</strong><span>${esc(ex.category||'Other')} · ${esc(art.equipment||'Custom')}</span></button><div class="lift-row-weight">${htmlNum(wt)}<small> lb</small></div><button class="quick-plus" aria-label="Log ${esc(ex.name)}" data-log="${esc(ex.id)}">+</button></article>`;}
@@ -93,14 +147,42 @@
       <div class="fact-card"><span class="fact-icon">✦</span><div><strong>Training note</strong><p>${esc(fact())}</p></div></div>
       ${latest.length?`<div class="section-header"><h2>Recent lifts</h2><button class="text-action" data-tab="history">History →</button></div><div class="panel recent-panel">${latest.map(historyRow).join('')}</div>`:''}`;
   };
-  function catalogCard(c){const own=data.exercises.find(e=>e.catalogId===c.id||e.id===c.id);return `<article class="catalog-card"><button type="button" class="catalog-art" data-exercise-info="${esc(c.id)}" aria-label="Learn about ${esc(c.name)}">${figure(c)}</button><div class="catalog-copy"><strong>${esc(c.name)}</strong><span>${esc(c.equipment)}</span><div class="catalog-tags"><small>${esc(c.category)}</small></div></div><button class="catalog-action ${own?'existing':''}" data-pick-catalog="${esc(c.id)}" aria-label="${own?'Log':'Add'} ${esc(c.name)}">${own?'Log':'Add +'}</button></article>`}
-  function catalogMatches(){return CATALOG.filter(c=>(catalogFilter==='All'||c.category===catalogFilter)&&`${c.name} ${c.equipment} ${c.category}`.toLowerCase().includes(catalogSearch.toLowerCase().trim()));}
-  function catalogCards(){const matches=catalogMatches();return `<div class="catalog-results">${matches.length} exercise${matches.length===1?'':'s'} found</div>${matches.length?`<div class="catalog-grid">${matches.map(catalogCard).join('')}</div>`:'<p class="muted-inset">No matches. Try another name or muscle group.</p>'}`;}
+  function catalogCard(c){
+    const own=data.exercises.find(e=>e.catalogId===c.id||e.id===c.id);
+    const ambiguous=c.id==='calf-raises'||c.id==='leg-curl';
+    const label=ambiguous?'Choose type':own?'Log':'Add +';
+    const action=ambiguous?`data-exercise-info="${esc(c.id)}"`:`data-pick-catalog="${esc(c.id)}"`;
+    const cue=ambiguous?(c.id==='calf-raises'?'Choose standing, seated or leg-press style.':'Choose seated or lying style, if known.'):c.cue;
+    return `<article class="catalog-card"><button type="button" class="catalog-art" data-exercise-info="${esc(c.id)}" aria-label="View ${esc(c.name)} start and finish images">${figure(c)}</button><div class="catalog-copy"><strong>${esc(c.name)}</strong><span>${esc(c.equipment)}</span><p class="catalog-cue">${esc(cue)}</p><div class="catalog-tags"><small>${esc(c.category)}</small></div></div><button class="catalog-action ${own?'existing':''}" ${action} aria-label="${esc(label)}: ${esc(c.name)}">${esc(label)}</button></article>`;
+  }
+  function normalizeSearch(x){return String(x||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();}
+  function catalogScore(c,phrase){
+    if(!phrase)return 1;
+    const name=normalizeSearch(c.name),aliases=(ALIASES[c.id]||[]).map(normalizeSearch);
+    const misc=normalizeSearch(`${c.category} ${c.equipment} ${c.cue}`);
+    if(name===phrase)return 100;
+    if(aliases.includes(phrase))return 96;
+    if(name.startsWith(phrase))return 83;
+    if(aliases.some(a=>a.startsWith(phrase)))return 79;
+    if(name.includes(phrase))return 74;
+    if(aliases.some(a=>a.includes(phrase)))return 70;
+    if(misc.includes(phrase))return 42;
+    const all=[name,...aliases,misc].join(' ');
+    return phrase.split(' ').every(t=>all.includes(t))?20:0;
+  }
+  function catalogMatches(){const query=normalizeSearch(catalogSearch);
+    return CATALOG.filter(c=>catalogFilter==='All'||c.category===catalogFilter)
+      .map((c,i)=>({c,i,score:catalogScore(c,query)}))
+      .filter(x=>x.score>0)
+      .sort((a,b)=>b.score-a.score||a.i-b.i).map(x=>x.c);
+  }
+  function catalogCards(){const matches=catalogMatches();return `<div class="catalog-results">${matches.length} exercise${matches.length===1?'':'s'} found</div>${matches.length?`<div class="catalog-grid">${matches.map(catalogCard).join('')}</div>`:'<p class="muted-inset">No matches yet. Try a shorter name (e.g. “calves”), or describe the machine.</p>'}`;}
   exercises=function(){return `<div class="page-top"><span class="eyebrow">YOUR WORKOUTS</span><h1>Find your movement.</h1><p class="sub">Search by name, equipment or muscle group. Tap an illustration to identify the exercise.</p></div>
     <div class="section-header"><h2>My exercises <span class="count-inline">${data.exercises.length}</span></h2><button id="addExercise" class="text-action">+ Custom</button></div>
     <div class="panel list-panel">${data.exercises.map(row).join('')||'<p class="muted-inset">Nothing tracked yet.</p>'}</div>
-    <div class="section-header"><h2>Browse exercise gallery</h2><span class="hint">Offline illustrations</span></div>
-    <label class="search-wrap" for="catalogSearch"><span aria-hidden="true">⌕</span><input id="catalogSearch" type="search" placeholder="e.g. leg curl, cable, chest..." value="${esc(catalogSearch)}" autocomplete="off"/></label>
+    <div class="section-header"><h2>Browse exercise gallery</h2><span class="hint">Start / finish references</span></div>
+     <div class="search-wrap" role="search"><label class="search-label" for="catalogSearch">Search exercises</label><span aria-hidden="true">⌕</span><input id="catalogSearch" type="search" placeholder="Name, machine or muscle..." value="${esc(catalogSearch)}" autocomplete="off"/><button type="button" id="voiceExerciseSearch" class="voice-search-button" aria-label="Search exercises using your voice" aria-pressed="false" title="Speak an exercise name"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5m-4 0h8"/></svg></button></div>
+     <p class="voice-status" id="voiceSearchStatus" role="status" aria-live="polite">Tap the microphone to search by speaking, or use keyboard dictation.</p>
     <div class="catalog-filters" role="group" aria-label="Muscle group">${['All','Legs','Chest','Back','Shoulders','Arms','Core'].map(s=>`<button data-catalog-filter="${esc(s)}" class="chip ${catalogFilter===s?'selected':''}">${esc(s)}</button>`).join('')}</div>
     <div id="catalogResults">${catalogCards()}</div>`;
   };
@@ -171,13 +253,71 @@
   const baseSettings=settings;
   settings=function(){return `${baseSettings()}<div class="panel info-panel"><strong>Social & device roadmap</strong><p>Manual cardio and opt-in summary sharing work locally. Live friend groups and wearable syncing need secure infrastructure and permission-based integrations.</p><button class="secondary" data-tab="groups">Friends & privacy</button></div>`};
   render=function(){mark();const pages={home,exercises,history,coach,settings,cardio:cardioPage,groups:groupPage};app.innerHTML=(pages[tab]||home)();document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));};
-  function openCatalogInfo(id){const c=CATALOG.find(x=>x.id===id);if(!c)return;openModal(`${modalTop(c.name,c.category+' · '+c.equipment)}<div class="detail-figure">${figure(c,true)}</div><p class="detail-cue">${esc(c.cue)}</p><p class="smallprint">Illustration is simplified and for identifying the movement, not a full technique tutorial.</p><button class="primary full" data-pick-catalog="${esc(c.id)}">${data.exercises.some(e=>e.catalogId===c.id||e.id===c.id)?'Log this exercise':'Add to my exercises'}</button>`);}
+  function openCatalogInfo(id){
+    const c=CATALOG.find(x=>x.id===id);if(!c)return;
+    const variants=id==='calf-raises'?
+      ['standing-calf-raise','seated-calf-raise','leg-press-calf-raise']:
+      id==='leg-curl'?['seated-leg-curl','lying-leg-curl']:[];
+    if(variants.length){
+      const description=id==='calf-raises'?'These are different movements and machines. Choose the one you used.':'A seated and a lying leg curl use different machines. Keep your existing weight record as-is unless you know which one it was.';
+      openModal(`${modalTop('Which variation?',c.category+' · '+c.name)}<p class="detail-cue">${esc(description)}</p><div class="variation-select-list">${variants.map(v=>{
+        const x=CATALOG.find(y=>y.id===v);
+        return `<article class="variation-option"><button type="button" data-pick-catalog="${esc(x.id)}" aria-label="Select ${esc(x.name)}">${figure(x)}<span><strong>${esc(x.name)}</strong><small>${esc(x.equipment)} — ${esc(x.cue)}</small></span><b>Choose →</b></button></article>`;
+      }).join('')}</div><button class="secondary full" data-pick-catalog="${esc(c.id)}">Keep as ${esc(c.name)} (unspecified)</button>`);
+      return;
+    }
+    openModal(`${modalTop(c.name,c.category+' · '+c.equipment)}<div class="detail-figure">${figure(c,true)}</div><p class="detail-cue"><strong>How to recognize it:</strong> ${esc(c.cue)}</p><p class="smallprint">Images are visual identification aids, not professional form instructions. Machine designs vary.</p><button class="primary full" data-pick-catalog="${esc(c.id)}">${data.exercises.some(e=>e.catalogId===c.id||e.id===c.id)?'Log this exercise':'Add to my exercises'}</button>`);
+  }
   function pickCatalog(id){const c=CATALOG.find(x=>x.id===id);if(!c)return;const existing=data.exercises.find(x=>x.catalogId===c.id||x.id===c.id);
     if(existing){if(modalRoot.innerHTML)closeModal();openLog(existing.id);return;}
     const ex={id:c.id,name:c.name,category:c.category,loadType:c.loadType,perSide:false,plates:{},directWeight:0,notes:`${c.equipment}. ${c.cue}`,catalogId:c.id};
     data.exercises.push(ex);if(save()){if(modalRoot.innerHTML)closeModal();render();notify('Exercise added — set your working weight');openExercise(ex.id)}
   }
+  const VoiceRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  let recognition=null,voiceActive=false,voiceText='';
+  function voiceStatus(message){
+    voiceText=message;
+    const status=$('#voiceSearchStatus'),button=$('#voiceExerciseSearch');
+    if(status)status.textContent=message;
+    if(button){button.classList.toggle('listening',voiceActive);button.setAttribute('aria-pressed',String(voiceActive));button.setAttribute('aria-label',voiceActive?'Stop voice search':'Search exercises using your voice');}
+  }
+  function cleanVoiceText(s){
+    // Keep equipment words such as "machine"; they help identify variations.
+    return normalizeSearch(s)
+      .replace(/^(?:(?:hey|please|can you|could you|find me|find|search for|search|show me|show|look up|i did|i am doing|i want to do|the exercise|an exercise)\s+)+/g,'')
+      .replace(/\s+(?:exercise|workout)$/,'').trim()||normalizeSearch(s);
+  }
+  function startVoiceSearch(){
+    const field=$('#catalogSearch');if(!field)return;
+    if(voiceActive&&recognition){recognition.stop();return;}
+    if(!VoiceRecognition||window.isSecureContext===false){
+      field.focus();voiceStatus('Voice recognition is not available here. Tap your iPhone keyboard microphone to dictate an exercise name.');
+      return;
+    }
+    let r;
+    try{r=new VoiceRecognition();}catch(_){field.focus();voiceStatus('Voice search unavailable. Use the keyboard microphone instead.');return;}
+    recognition=r;r.lang=navigator.language||'en-US';r.continuous=false;r.interimResults=false;r.maxAlternatives=1;
+    r.onstart=()=>{voiceActive=true;voiceStatus('Listening… Say an exercise name or describe the equipment.');};
+    r.onresult=event=>{
+      const raw=event.results?.[0]?.[0]?.transcript||'';
+      const spoken=cleanVoiceText(raw);
+      catalogFilter='All';catalogSearch=spoken;
+      field.value=spoken;
+      app.querySelectorAll('[data-catalog-filter]').forEach(b=>b.classList.toggle('selected',b.dataset.catalogFilter==='All'));
+      $('#catalogResults').innerHTML=catalogCards();
+      voiceStatus(spoken?`Heard: “${raw}” — ${catalogMatches().length} matching exercises.`:'No words detected. Try again or type a search.');
+    };
+    r.onerror=event=>{
+      const reason=event.error||'unknown';
+      voiceActive=false;
+      const desc=reason==='not-allowed'||reason==='service-not-allowed'?'Microphone permission denied. Enable it in browser settings, or use keyboard dictation.':reason==='no-speech'?'No speech detected. Try speaking closer to the microphone.':reason==='audio-capture'?'No microphone available. Use keyboard dictation instead.':reason==='network'?'Speech service unavailable. Try again online or use keyboard dictation.':'Voice search stopped. Type or dictate into the search box.';
+      voiceStatus(desc);
+    };
+    r.onend=()=>{voiceActive=false;recognition=null;voiceStatus(voiceText.startsWith('Listening')?'Voice search stopped.':voiceText);};
+    try{r.start();}catch(_){voiceActive=false;recognition=null;field.focus();voiceStatus('Could not start speech recognition. Use the iPhone keyboard microphone instead.');}
+  }
   app.addEventListener('click',e=>{
+    if(e.target.closest('#voiceExerciseSearch')){e.stopImmediatePropagation();startVoiceSearch();return;}
     const f=e.target.closest('[data-catalog-filter]');if(f){e.stopImmediatePropagation();catalogFilter=f.dataset.catalogFilter;app.querySelectorAll('[data-catalog-filter]').forEach(x=>x.classList.toggle('selected',x.dataset.catalogFilter===catalogFilter));$('#catalogResults').innerHTML=catalogCards();return;}
     const info=e.target.closest('[data-exercise-info]');if(info){e.stopImmediatePropagation();openCatalogInfo(info.dataset.exerciseInfo);return;}
     const pick=e.target.closest('[data-pick-catalog]');if(pick){e.stopImmediatePropagation();pickCatalog(pick.dataset.pickCatalog);return;}
