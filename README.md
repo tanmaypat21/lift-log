@@ -1,28 +1,30 @@
-# Lift Log v0.4 beta — visual exercise discovery, trends and cardio
+# Lift Log v0.4.1 — Exercise identification & voice search
 
-This beta lives on a development branch until reviewed. It is a local-first PWA; **no real friends feed, wearable integration, or live AI is implemented**.
+- The gallery now uses **actual start/end movement reference images** rather than stick figures. Images are stored with the app, load offline after caching, and have short cues explaining the equipment and motion. On opening an exercise, Start and Finish pictures appear alongside identification text.
+- **Calf raises are separated** into standing, seated and leg-press calf raise variations; ambiguous legacy exercises remain in your personal records and are **not automatically renamed or reclassified**. Hamstring leg curls similarly offer seated/lying choices.
+- Search supports common phrases such as “hamstring curl”, “leg press calves”, “standing calves” and “lat pull down”. There is a **microphone search button** that uses native browser speech recognition when supported. On unsupported iPhone/browser combinations, it focuses the search box for keyboard dictation.
+- Voice recordings are **not saved by Lift Log**. The browser may use its own speech-processing service; permission and availability depend on the browser and operating system. Search works without permission.
+- No change to workout storage keys or existing workout history. Please make a JSON backup before each update.
 
-## What's new
-
-- **Exercise gallery:** 25 common movements with self-contained simplified SVG illustrations, searchable names/equipment, muscle-group filters, and short identifying cues. Add and configure exercises from the gallery.
-- **Strength charts:** compare recorded loads or calculated volume (weight × sets × reps), choose an exercise and date range, and see the best logged load. Multiple logs in one day use the highest value for the chart.
-- **Cardio:** manually log sessions with activity type, time, distance, optional average heart rate and notes. Set an optional weekly minutes goal.
-- **Streamlined home:** quick logs, weekly training summary, conditional goal-weight distance and rotating short training reminders.
-- **Social preview:** share a weekly summary only by explicitly choosing metrics and invoking your phone's share sheet. No account, friend lists, cloud group or automatic upload.
-- **Data preserved:** uses the existing `liftlog.v1` local storage key; no automatic data resets or seeded new workouts. Please export a backup before switching app versions.
-- **Offline update:** changes the service-worker cache from v3 to v4 so updated assets can load on existing installs.
-
-## Current limitations
-
-Fitness band syncing needs a separate permission-based integration. HealthKit cannot be accessed directly by a plain GitHub Pages web app. Full group sharing requires secure authentication, a consent-aware database and users' sharing controls. Exercise drawings are identification aids, not precise biomechanical demonstrations.
+**Exercise image provenance:** 53 WebP reference images by [Open Exercise Illustrations / MarvinNazari](https://github.com/MarvinNazari/exercise-images), CC0-1.0 public domain. The dataset is AI-generated and not reviewed by a qualified coach; the drawings are for identifying exercises, not authoritative technique coaching. See `assets/exercises/asset-manifest.json` for the source and per-file SHA. We independently check the exercise names and variations, but equipment and posture details should not be treated as medical or professional instruction.
 
 ---
 
-# Lift Log v0.3 — Workout tracker + guided AI-coach onboarding
+# Lift Log v0.4 — Workout tracker + guided AI-coach onboarding
 
 A local-first, mobile-friendly Progressive Web App for gym loads, rep history, bodyweight check-ins, nutrition-goal starting guidance, and a personalized coaching interview.
 
 **The guided interview and starting recommendations are rule-based. There is no live AI model connected to this app.** A real in-app agent will require a securely hosted API/backend; the next product architecture is described in `AI_AGENT_SPEC.md`.
+
+## What's new in v0.4
+
+- **Visual exercise gallery:** 24 built-in movements, original offline SVG illustrations, muscle filters, search by equipment or name, cues, and one-tap add/configure. These are identifying sketches, not precise exercise form demonstrations.
+- **Modern home:** weekly workout goal (if entered in Coach), cardio minutes, conditional target-weight distance, concise quick logs and rotating training notes.
+- **Strength trend chart:** select exercise, load or volume (load × sets × reps), period filter, and see best load and change. Values are day-level maxima for consistency; weight and volume are not direct muscle-gain measurements.
+- **Manual cardio:** duration, distance, type, optional heart rate and notes, weekly minutes goal, and history. Device syncing is **not** active.
+- **Friends preview:** entirely optional weekly-summary sharing via system share sheet/clipboard. No cloud group, live friends list, leaderboard, or automatic sharing exists.
+- **All existing workout entries retained:** same `liftlog.v1` storage key, no migration or reset required. Export a JSON backup before updating.
+- Updated PWA service worker cache version. Existing installations may need to close/reopen or refresh to fetch the update.
 
 ## What's new in v0.3
 
@@ -59,7 +61,8 @@ To talk with an actual AI now, tap **Copy coaching brief**, then paste the text 
 
 ## Files
 
-- `index.html`, `styles.css`, `app.js` — full editable PWA implementation
+- `index.html`, `styles.css`, `app.js` — core tracker and coach
+- `v04.css`, `enhancements.js` — visual gallery, modern dashboard, progress trends, cardio and explicit share controls
 - `icon.svg`, `sw.js`, `manifest.webmanifest` — installation/offline assets
 - `AI_AGENT_SPEC.md` — agent behavior, data schema, tools, privacy and roadmap
 - `COACH_ROADMAP.md` — original roadmap reference

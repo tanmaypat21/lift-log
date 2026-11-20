@@ -1,0 +1,219 @@
+{
+  "source": "https://github.com/MarvinNazari/exercise-images",
+  "license": "CC0-1.0",
+  "sourceNotice": "AI-generated reference imagery; not verified exercise coaching",
+  "files": [
+    {
+      "path": "assets/exercises/bench-press/end.webp",
+      "sha": "45a6b58923c6a4bc9a99f9adc7a89515eb92f58d"
+    },
+    {
+      "path": "assets/exercises/bench-press/start.webp",
+      "sha": "d7f6587ad2afaa6c95737ff3c07ca5e37396eac4"
+    },
+    {
+      "path": "assets/exercises/biceps-curl/end.webp",
+      "sha": "e15a58ccef2f78e4daa1804cc4c27988a50f9c85"
+    },
+    {
+      "path": "assets/exercises/biceps-curl/start.webp",
+      "sha": "7ad9c90db04587b5c1b09b71ed1a8e8267ef2b06"
+    },
+    {
+      "path": "assets/exercises/cable-crunch/end.webp",
+      "sha": "80702e917c692dad07c975755438e9f3c5fe7a24"
+    },
+    {
+      "path": "assets/exercises/cable-crunch/start.webp",
+      "sha": "c2ae971bffc5832b581a78c0bf06aeff21e661f0"
+    },
+    {
+      "path": "assets/exercises/calf-raises/end.webp",
+      "sha": "f029b04f27c55e0d38bf863687b8cdabb3724457"
+    },
+    {
+      "path": "assets/exercises/calf-raises/start.webp",
+      "sha": "99dcf8c31f3c717d5e802b4c11f9e2bf93484c11"
+    },
+    {
+      "path": "assets/exercises/dumbbell-lunge/end.webp",
+      "sha": "c482ac29b27e9231ae1b54e0673bf4caeaea8c9e"
+    },
+    {
+      "path": "assets/exercises/dumbbell-lunge/start.webp",
+      "sha": "d54428fcc236df9434b5387eca8c16a1ab3c5e16"
+    },
+    {
+      "path": "assets/exercises/dumbbell-row/end.webp",
+      "sha": "8c36fa3fe371e37389079a1f3b494847b4889abb"
+    },
+    {
+      "path": "assets/exercises/dumbbell-row/start.webp",
+      "sha": "38b94b0914f5d438a378da88eecefe08228dca85"
+    },
+    {
+      "path": "assets/exercises/face-pulls/end.webp",
+      "sha": "d70de9e0f403cc797f7e2525b0a8b3f8af371b18"
+    },
+    {
+      "path": "assets/exercises/face-pulls/start.webp",
+      "sha": "e00ecfaf7680f1e173c6399f4b63f8c8d0b43969"
+    },
+    {
+      "path": "assets/exercises/hip-thrusts/end.webp",
+      "sha": "276a0a4ad9e881a0d291a1cd416c378d9e3f9b06"
+    },
+    {
+      "path": "assets/exercises/hip-thrusts/start.webp",
+      "sha": "bb2f9af628cb565134f4f59ede20d48ad8b42189"
+    },
+    {
+      "path": "assets/exercises/incline-dumbbell-press/end.webp",
+      "sha": "9cb46928023fc462dddcce82b0cc84a825ba1943"
+    },
+    {
+      "path": "assets/exercises/incline-dumbbell-press/start.webp",
+      "sha": "8f2f0dc7fedfc5b5d30804cb756b5e61e3d9a4ae"
+    },
+    {
+      "path": "assets/exercises/lat-pulldown/end.webp",
+      "sha": "51f25aa48265da23742aa21c69b7113785241ca2"
+    },
+    {
+      "path": "assets/exercises/lat-pulldown/start.webp",
+      "sha": "5e403cb3ed257decf1b87cbc1716525d299d4031"
+    },
+    {
+      "path": "assets/exercises/lateral-raises/end.webp",
+      "sha": "9807eb96aa51cbbc8d757e18165a50888f5affce"
+    },
+    {
+      "path": "assets/exercises/lateral-raises/start.webp",
+      "sha": "e02326ccb6b5c9db41f30ae5ac7ea40c9dfa7727"
+    },
+    {
+      "path": "assets/exercises/leg-curl/end.webp",
+      "sha": "d52199b96d3b326050bee26fdc044dc45e94baee"
+    },
+    {
+      "path": "assets/exercises/leg-curl/start.webp",
+      "sha": "00b9781e53c715e9180106facc223644f24f919e"
+    },
+    {
+      "path": "assets/exercises/leg-extension/end.webp",
+      "sha": "068496e48db447af6e5aa8dda242735511662061"
+    },
+    {
+      "path": "assets/exercises/leg-extension/start.webp",
+      "sha": "d0cbbc7e512204fb273699ca1c915185cc1d8cb8"
+    },
+    {
+      "path": "assets/exercises/leg-press-calf-raise/end.webp",
+      "sha": "bde41333c0f06c4aeb8234f3e5ba70b5d96a5aca"
+    },
+    {
+      "path": "assets/exercises/leg-press-calf-raise/start.webp",
+      "sha": "17995d8aef152cf502aacf011bb169f5f23a6562"
+    },
+    {
+      "path": "assets/exercises/leg-press/end.webp",
+      "sha": "de75dcf399bf41a3026821c8c245b8902349ec83"
+    },
+    {
+      "path": "assets/exercises/leg-press/start.webp",
+      "sha": "be0ec9c6d2dc3a02633dde96184f0c1121e260d5"
+    },
+    {
+      "path": "assets/exercises/overhead-press/end.webp",
+      "sha": "227717cba733974e94d4ecb18cf1244872382382"
+    },
+    {
+      "path": "assets/exercises/overhead-press/start.webp",
+      "sha": "946888bf9d59c948b5082b0ddf35f8f2a6a894f2"
+    },
+    {
+      "path": "assets/exercises/pec-deck/end.webp",
+      "sha": "ff7edb52b5813438e8c687533a6d8fa3340cfc62"
+    },
+    {
+      "path": "assets/exercises/pec-deck/start.webp",
+      "sha": "7755854fb72f5ade04ee4b4e7a5b30236a46adb9"
+    },
+    {
+      "path": "assets/exercises/plank/hold.webp",
+      "sha": "4c23e0a154f41116dd7494a657f7c6b9c59f4409"
+    },
+    {
+      "path": "assets/exercises/pull-up/end.webp",
+      "sha": "52ad8e9272b1232f73ff2b6f05466d4da96f4a75"
+    },
+    {
+      "path": "assets/exercises/pull-up/start.webp",
+      "sha": "7e4998ad07069fcb483707f3e592a1eca52212da"
+    },
+    {
+      "path": "assets/exercises/push-up/end.webp",
+      "sha": "5d3a2259535e01076f3f585375c1d75f239f3709"
+    },
+    {
+      "path": "assets/exercises/push-up/start.webp",
+      "sha": "db2d24b074410fa001a9dd774ab84704081a1b07"
+    },
+    {
+      "path": "assets/exercises/romanian-deadlift/end.webp",
+      "sha": "cae925fdd99512e7974a5c5534af1a00ed1dfad6"
+    },
+    {
+      "path": "assets/exercises/romanian-deadlift/start.webp",
+      "sha": "d1908e2da20450ad8c52c71af64e393a7f0a6ec3"
+    },
+    {
+      "path": "assets/exercises/seated-cable-row/end.webp",
+      "sha": "9a24d60a1e324484cadcf5e490a1ff09265c4e9f"
+    },
+    {
+      "path": "assets/exercises/seated-cable-row/start.webp",
+      "sha": "6b862b19ae28cce107f879a10c8fa307c4aabe1a"
+    },
+    {
+      "path": "assets/exercises/seated-calf-raise-machine/end.webp",
+      "sha": "b3ceb066a1785760c8c9415adf21e741d7e9ec93"
+    },
+    {
+      "path": "assets/exercises/seated-calf-raise-machine/start.webp",
+      "sha": "ba0450dacc13173333c1db07783610bf471415dd"
+    },
+    {
+      "path": "assets/exercises/seated-leg-curl/end.webp",
+      "sha": "ed8efa0a0d72440c293268ce81dbefbd78c04f07"
+    },
+    {
+      "path": "assets/exercises/seated-leg-curl/start.webp",
+      "sha": "9deb68e35f3c2cb14e1409d761f71281ccb4ab67"
+    },
+    {
+      "path": "assets/exercises/squat/end.webp",
+      "sha": "1ab646c160bb1f51c954cd4e753a3ee117615686"
+    },
+    {
+      "path": "assets/exercises/squat/start.webp",
+      "sha": "7ed7329203b2a49f67b2b85ac8b36b4264857311"
+    },
+    {
+      "path": "assets/exercises/standing-calf-raise-machine/end.webp",
+      "sha": "eac65b7818fb63827bc597a321814e86ab688a9c"
+    },
+    {
+      "path": "assets/exercises/standing-calf-raise-machine/start.webp",
+      "sha": "786c0f1d26063cd88045b592ef7f793f98c17cb1"
+    },
+    {
+      "path": "assets/exercises/tricep-pushdowns/end.webp",
+      "sha": "9fd2e3eeaae3db6c31c44683f15d451694e747e8"
+    },
+    {
+      "path": "assets/exercises/tricep-pushdowns/start.webp",
+      "sha": "f550e93d27268f90bca55e258f83d06a93dc77b1"
+    }
+  ]
+}
