@@ -147,7 +147,12 @@
   const $ = (s,root=document) => root.querySelector(s);
   function mark(){if(!Array.isArray(data.cardio))data.cardio=[];if(!data.sharePrefs||typeof data.sharePrefs!=='object')data.sharePrefs={workouts:false,cardio:false,records:false}; if(typeof data.cardioGoal!=='number')data.cardioGoal=0;}
   mark();
-  function mediaPath(id,frame='start') { return `./assets/exercises/${id}/${frame}.webp`; }
+  // Bundled images work offline. New CC0 references load online from the source library.
+  const REMOTE_IMAGE_SLUGS = new Set(["close-grip-lat-pulldown","reverse-grip-lat-pulldown","straight-arm-pulldown","machine-high-row","machine-row","chest-supported-t-bar-row","chest-supported-dumbbell-row","t-bar-row","single-arm-cable-row","assisted-pull-up","reverse-grip-barbell-row","wide-grip-pull-up","neutral-grip-pull-up","preacher-curl","machine-preacher-curl","dumbbell-preacher-curl","incline-dumbbell-curl","hammer-curls","cross-body-hammer-curl","rope-hammer-curl","cable-curl","single-arm-cable-curl","concentration-curl","spider-curl","reverse-curl","ez-bar-curl","alternating-dumbbell-curl","barbell-curl","chest-press-machine","dumbbell-chest-press","plate-loaded-incline-chest-press","dumbbell-shoulder-press","shoulder-press-machine","rear-delt-fly","machine-lateral-raise","standing-leg-curl-machine","hack-squat","leg-press-moving-plate"]);
+  function mediaPath(id,frame='start') {
+    if(REMOTE_IMAGE_SLUGS.has(id))return `https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/images/${id}/${frame}.webp`;
+    return `./assets/exercises/${id}/${frame}.webp`;
+  }
   function figure(ex,large=false){
     const id=MEDIA[ex.id];
     if(!id){return `<div class="exercise-visual visual-fallback" role="img" aria-label="No reference image for ${esc(ex.name)}"><span aria-hidden="true">${esc(categoryIcon(ex.category))}</span><small>Custom exercise</small></div>`;}
