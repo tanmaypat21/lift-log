@@ -211,14 +211,18 @@
   }
   function catalogCards(){const matches=catalogMatches(),display=matches.slice(0,catalogShown);return `<div class="catalog-results">${matches.length} exercise${matches.length===1?'':'s'} found · showing ${display.length}</div>${matches.length?`<div class="catalog-grid">${display.map(catalogCard).join('')}</div>${matches.length>display.length?`<button class="secondary catalog-more" type="button" data-catalog-more>Show more exercises (${matches.length-display.length} remaining)</button>`:''}`:'<p class="muted-inset">No matches yet. Try a shorter name (e.g. “calves”), a muscle group, or another equipment type.</p>'}`;}
   exercises=function(){return `<div class="page-top"><span class="eyebrow">YOUR WORKOUTS</span><h1>Find your movement.</h1><p class="sub">Search by name, equipment or muscle group. Tap an illustration to identify the exercise.</p></div>
-    <div class="section-header"><h2>My saved exercises <span class="count-inline">${data.exercises.length}</span></h2><button id="addExercise" class="text-action">+ Custom</button></div>
-    <div class="panel list-panel">${data.exercises.map(row).join('')||'<p class="muted-inset">Nothing tracked yet.</p>'}</div>
     <div class="section-header"><h2>Browse ${CATALOG.length} available exercises</h2><span class="hint">Start / finish references</span></div>
      <div class="search-wrap" role="search"><label class="search-label" for="catalogSearch">Search exercises</label><span aria-hidden="true">⌕</span><input id="catalogSearch" type="search" placeholder="Name, machine or muscle..." value="${esc(catalogSearch)}" autocomplete="off"/><button type="button" id="voiceExerciseSearch" class="voice-search-button" aria-label="Search exercises using your voice" aria-pressed="false" title="Speak an exercise name"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5m-4 0h8"/></svg></button></div>
      <p class="voice-status" id="voiceSearchStatus" role="status" aria-live="polite">Tap the microphone to search by speaking, or use keyboard dictation.</p>
     <div class="catalog-filters" role="group" aria-label="Muscle group">${['All','Legs','Chest','Back','Shoulders','Arms','Core','Other'].map(s=>`<button data-catalog-filter="${esc(s)}" class="chip ${catalogFilter===s?'selected':''}">${esc(s)}</button>`).join('')}</div>
     <div class="equipment-filter"><label for="catalogEquipment">Equipment</label><select id="catalogEquipment">${['All','Machine','Cable','Dumbbell','Barbell','Bodyweight','Band','Kettlebell','Other'].map(s=>`<option value="${s}" ${catalogEquipment===s?'selected':''}>${s==='All'?'All equipment':s}</option>`).join('')}</select><small>Exercise images may require internet the first time.</small></div>
-    <div id="catalogResults">${catalogCards()}</div>`;
+    <div id="catalogResults">${catalogCards()}</div>
+    <div class="v61-custom-from-library">
+      <span><strong>Not in the library?</strong><small>Create an exercise with your own name and equipment setup.</small></span>
+      <button id="addExercise" class="secondary" type="button">+ Create Custom Exercise</button>
+    </div>
+    <div class="section-header"><h2>My saved exercises <span class="count-inline">${data.exercises.length}</span></h2><span class="hint">Quick log</span></div>
+    <div class="panel list-panel">${data.exercises.map(row).join('')||'<p class="muted-inset">No saved exercises yet.</p>'}</div>`;
   };
   function shownPoints(id){let rs=entriesFor(id).filter(r=>Number.isFinite(Number(r.weight))&&Number(r.weight)>0);
     if(chartRange!=='all'){const d=new Date();d.setDate(d.getDate()-Number(chartRange));const cutoff=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;rs=rs.filter(r=>r.date>=cutoff)}
