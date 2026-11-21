@@ -31,6 +31,21 @@
     ['standing-calf-raise','Standing Calf Raise','Legs','Standing calf raise machine','calf','Shoulder pads over your shoulders; stand with toes on the step and lift your heels.','direct'],
     ['seated-calf-raise','Seated Calf Raise','Legs','Seated calf raise machine','calf','Sit with padded resistance across thighs; raise your heels from the foot platform.','direct'],
     ['leg-press-calf-raise','Leg Press Calf Raise','Legs','Leg press machine','presslegs','Sit in a leg press; keep knees nearly still as the balls of your feet move the sled.','plates']
+,
+    ["wide-grip-lat-pulldown","Wide-Grip Lat Pulldown","Back","Wide overhand bar · cable tower","pulldown","Hands wider than shoulders; pull bar toward upper chest.","direct"],
+    ["close-grip-lat-pulldown","Close-Grip Lat Pulldown","Back","V handle · cable tower","pulldown","Pull narrow handle to chest with elbows close to sides.","direct"],
+    ["reverse-grip-lat-pulldown","Reverse-Grip Lat Pulldown","Back","Underhand bar · cable tower","pulldown","Palms face you as you pull the bar toward your upper chest.","direct"],
+    ["straight-arm-pulldown","Straight-Arm Cable Pulldown","Back","High cable · straight bar","pulldown","Sweep arms downward toward thighs with elbows nearly straight.","direct"],
+    ["machine-high-row","Machine High Row","Back","High-row machine","row","Pull handles from above down toward upper ribs.","direct"],
+    ["machine-row","Seated Machine Row","Back","Seated row machine","row","Pull handles toward your torso on a supported row machine.","direct"],
+    ["chest-supported-t-bar-row","Chest-Supported T-Bar Row","Back","Chest-supported T-bar machine","row","Rest chest on the pad and row handles toward ribs.","direct"],
+    ["chest-supported-dumbbell-row","Chest-Supported Dumbbell Row","Back","Incline bench · dumbbells","row","Lie chest-down on incline bench; pull dumbbells upward.","direct"],
+    ["t-bar-row","T-Bar Row","Back","T-bar row station","row","Hinge at hips and pull T-bar handles toward torso.","direct"],
+    ["single-arm-cable-row","Single-Arm Cable Row","Back","Seated cable · single handle","row","Row one handle with a steady torso.","direct"],
+    ["assisted-pull-up","Assisted Pull-Up","Back","Assisted pull-up machine","pullup","Pull yourself upward with assistance from knee or foot pad.","direct"],
+    ["reverse-grip-barbell-row","Underhand Barbell Row","Back","Barbell · underhand grip","row","Row a barbell with palms facing upward.","direct"],
+    ["wide-grip-pull-up","Wide-Grip Pull-Up","Back","Wide pull-up bar","pullup","Pull up with overhand hands wider than shoulders.","direct"],
+    ["neutral-grip-pull-up","Neutral-Grip Pull-Up","Back","Parallel-grip pull-up handles","pullup","Pull upward with palms facing each other.","direct"]
   ].map(([id,name,category,equipment,pose,cue,loadType]) => ({id,name,category,equipment,pose,cue,loadType}));
   // Bundled CC0 reference images, from MarvinNazari/exercise-images.
   // Keep the same exercise IDs: users' existing logs must never be re-labelled automatically.
@@ -47,6 +62,7 @@
     'seated-calf-raise':'seated-calf-raise-machine',
     'leg-press-calf-raise':'leg-press-calf-raise'
   };
+  Object.assign(MEDIA, {"wide-grip-lat-pulldown":"lat-pulldown","close-grip-lat-pulldown":"close-grip-lat-pulldown","reverse-grip-lat-pulldown":"reverse-grip-lat-pulldown","straight-arm-pulldown":"straight-arm-pulldown","machine-high-row":"machine-high-row","machine-row":"machine-row","chest-supported-t-bar-row":"chest-supported-t-bar-row","chest-supported-dumbbell-row":"chest-supported-dumbbell-row","t-bar-row":"t-bar-row","single-arm-cable-row":"single-arm-cable-row","assisted-pull-up":"assisted-pull-up","reverse-grip-barbell-row":"reverse-grip-barbell-row","wide-grip-pull-up":"wide-grip-pull-up","neutral-grip-pull-up":"neutral-grip-pull-up"});
   const ALIASES = {
     'calf-raises':['calves','calf machine','heel raises','toe raises','calf raises'],
     'standing-calf-raise':['standing calves','standing calf','calf raise machine','standing heel raise','calves machine','machine calves'],
