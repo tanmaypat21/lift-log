@@ -63,3 +63,6 @@ body{background:radial-gradient(circle at 94% -6%,#1a2f35 0,transparent 40%),var
 .voice-status{font-size:11px;line-height:1.35;color:var(--muted);margin:6px 4px 2px;min-height:15px}
 @media(min-width:650px){.catalog-art{min-height:170px}.exercise-motion-frames img{height:245px}}
 @media(max-width:390px){.catalog-art{min-height:110px}.catalog-cue{font-size:10px}.catalog-card{gap:6px}.variation-option .exercise-visual{width:64px;min-width:64px;height:65px}.variation-option b{font-size:10px}.exercise-motion-frames img{height:130px}}
+
+/* v0.5 — browse hundreds of movements without flooding the mobile screen */
+.equipment-filter{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:5px 0 11px}.equipment-filter label{color:var(--muted);font-size:12px;font-weight:650}.equipment-filter select{appearance:auto;flex:0 0 auto;max-width:200px;background:#162434;color:#eef5fc;border:1px solid #3d5362;border-radius:10px;padding:8px 11px;min-height:40px}.equipment-filter small{flex-basis:100%;color:var(--muted);font-size:10px}.catalog-more{display:block;margin:15px auto 6px;min-height:45px;width:min(100%,350px)}.image-offline{font-size:11px;color:var(--muted);display:grid;place-items:center;min-height:60px;text-align:center;padding:7px}.catalog-card .catalog-cue{min-height:32px}.catalog-results{font-variant-numeric:tabular-nums}
