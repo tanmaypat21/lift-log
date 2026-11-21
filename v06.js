@@ -45,10 +45,10 @@
   }
   function trendRecords(exerciseId,metric=trendMetric,period=trendWindow){
     const start = period==='all' ? null : daysAgo(Math.max(0,Number(period)-1));
-    const matching=workoutEntries().filter(r=>r.exerciseId===exerciseId && (!start||r.date>=start) && Number(r.weight)>0);
+    const matching=workoutEntries().filter(r=>r.exerciseId===exerciseId && (!start||r.date>=start) && (metric==='reps'?Number(r.reps)>0:Number(r.weight)>0));
     const grouped = new Map();
     for(const entry of matching){
-      const value = metric==='volume'
+      const value = metric==='reps' ? (Number(entry.reps)>0?Number(entry.reps):null) : metric==='volume'
         ? (Number(entry.sets)>0&&Number(entry.reps)>0?Number(entry.weight)*Number(entry.sets)*Number(entry.reps):null)
         : Number(entry.weight);
       if(value===null||!Number.isFinite(value))continue;
@@ -82,7 +82,7 @@
     </svg></div>`;
   }
   function metricSelector(){
-    return `<div class="v6-segmented" role="group" aria-label="Progress measure"><button type="button" data-v6-metric="load" class="${trendMetric==='load'?'active':''}" aria-pressed="${trendMetric==='load'}">Best weight</button><button type="button" data-v6-metric="volume" class="${trendMetric==='volume'?'active':''}" aria-pressed="${trendMetric==='volume'}">Volume</button></div>`;
+    return `<div class="v6-segmented" role="group" aria-label="Progress measure"><button type="button" data-v6-metric="load" class="${trendMetric==='load'?'active':''}" aria-pressed="${trendMetric==='load'}">Best weight</button><button type="button" data-v6-metric="volume" class="${trendMetric==='volume'?'active':''}" aria-pressed="${trendMetric==='volume'}">Volume</button><button type="button" data-v6-metric="reps" class="${trendMetric==='reps'?'active':''}" aria-pressed="${trendMetric==='reps'}">Reps</button></div>`;
   }
   function chartCard(){
     const available=trendExercises();
@@ -94,7 +94,7 @@
     const points=trendRecords(selectedTrendExercise);
     const first=points[0]?.value,last=points.at(-1)?.value;
     const delta=points.length>1?last-first:null;
-    const goalLabel=trendMetric==='load'?'lb':'lb × reps';
+    const goalLabel=trendMetric==='load'?'lb':trendMetric==='reps'?'reps / set':'lb × reps';
     const difference=delta===null?'Add another training day':`${delta>0?'+':''}${formatNum(delta)} ${goalLabel} since first recorded day`;
     const prior=points.length>1&&first>0?` (${delta>0?'+':''}${Math.round(delta/first*100)}%)`:'';
     return `<section class="v6-surface v6-feature" aria-label="Your strength progress"><div class="v6-card-head"><div><span class="v6-eyebrow">ACTUAL WORKOUT DATA</span><h2>Strength trend</h2></div><span class="v6-hint">${points.length} recorded ${points.length===1?'day':'days'}</span></div>
@@ -144,7 +144,7 @@
     const sets=Number(record.sets),reps=Number(record.reps);
     const repText=sets>0&&reps>0?`${sets} sets × ${reps} reps`:'Sets / reps not recorded';
     const notes=String(record.notes||'');
-    return `<div class="v6-record"><div class="v6-record-icon" aria-hidden="true">↗</div><div class="v6-record-info"><strong>${escapeText(exerciseName(record.exerciseId))}</strong><span>${escapeText(repText)}${notes?` · ${escapeText(notes.slice(0,75))}`:''}</span></div><div class="v6-record-weight"><strong>${formatNum(record.weight)} lb</strong><button type="button" data-v6-edit-entry="${escapeText(record.id)}">Edit</button></div></div>`;
+    return `<div class="v6-record"><div class="v6-record-icon" aria-hidden="true">↗</div><div class="v6-record-info"><strong>${escapeText(exerciseName(record.exerciseId))}</strong><span>${escapeText(repText)}${notes?` · ${escapeText(notes.slice(0,75))}`:''}</span></div><div class="v6-record-weight"><strong>${record.exerciseId==='ab-coaster'&&Number(record.weight)===0?'Bodyweight':formatNum(record.weight)+' lb'}</strong><button type="button" data-v6-edit-entry="${escapeText(record.id)}">Edit</button></div></div>`;
   }
   function loggedCardio(record){
     const detail=[`${formatNum(record.duration)} min`,record.distance?`${formatNum(record.distance)} mi`:null,record.avgHr?`${formatNum(record.avgHr)} bpm`:null].filter(Boolean).join(' · ');
@@ -165,27 +165,78 @@
       <p class="v6-journal-footer">Entries are grouped using the dates you logged. Your existing records haven't been changed.</p>
     </div>`;
   }
-  function quickLog(date){
-    const selected=isoDate(date)?date:today();
-    selectedJournalDate=selected;
-    const renderItems=term=>{
-      const q=String(term||'').toLowerCase().trim();
-      const matches=data.exercises.filter(e=>e.name.toLowerCase().includes(q)).slice(0,30);
-      return matches.length?matches.map(e=>`<button type="button" class="v6-picker-item" data-v6-pick-exercise="${escapeText(e.id)}"><span><strong>${escapeText(e.name)}</strong><small>${escapeText(e.category||'Other')}</small></span><span aria-hidden="true">+</span></button>`).join(''):'<p class="v6-muted">No saved exercises match. Browse the exercise library to add one.</p>';
-    };
-    openModal(`${modalTop('Log an exercise','Choose a movement and the date')}<div class="v6-picker"><label class="v6-field">Training date<input id="v6PickerDate" type="date" value="${escapeText(selected)}" required /></label><label class="v6-field">Find a saved exercise<input id="v6PickerSearch" type="search" placeholder="Search your workouts" autocomplete="off" /></label><div class="v6-picker-list" id="v6PickerList">${renderItems('')}</div><button type="button" class="v6-picker-browse" data-v6-browse-exercises>Find an exercise in the full library →</button></div>`);
-    modalRoot.querySelector('#v6PickerSearch')?.addEventListener('input',e=>{const el=modalRoot.querySelector('#v6PickerList');if(el)el.innerHTML=renderItems(e.target.value)});
+  function quickLog(date) {
+  const selected = isoDate(date)?date:today();
+  selectedJournalDate = selected;
+  const catalog = window.LiftLogCatalog;
+  let visible = 20;
+  let query = '';
+  const normal = value => String(value||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  const savedExercise = entry => data.exercises.find(ex=>
+    ex.id===entry.id||ex.catalogId===entry.id||normal(ex.name)===normal(entry.name));
+  const recentDate = entry => {
+    const saved=savedExercise(entry);
+    return saved ? (recent(saved.id)?.date || '') : '';
+  };
+  function renderPickerResults(){
+    if(!catalog) return '<p class="v6-muted">Exercise library is unavailable. Reopen Lift Log after the update finishes.</p>';
+    const all=catalog.list(),normalized=normal(query);
+    const listed=new Set(all.map(entry=>normal(entry.name)));
+    const extra=data.exercises.filter(ex=>!listed.has(normal(ex.name))&&!all.some(entry=>entry.id===ex.id||entry.id===ex.catalogId));
+    const extraMatches=extra.filter(ex=>!normalized || normal(`${ex.name} ${ex.category} ${ex.notes||''}`).includes(normalized));
+    let matches=catalog.search(query).map(entry=>({entry,custom:false}));
+    if(!normalized){
+      matches.sort((a,b)=>Number(!!savedExercise(b.entry))-Number(!!savedExercise(a.entry))||recentDate(b.entry).localeCompare(recentDate(a.entry)));
+    }
+    matches=[...extraMatches.map(entry=>({entry,custom:true})),...matches];
+    const rows=matches.slice(0,visible).map(({entry,custom})=>{
+      const saved=custom?savedExercise(entry)||entry:savedExercise(entry);
+      const visual=catalog.visual(entry);
+      const key=custom?'data-v6-saved-pick':'data-v6-library-pick';
+      return `<button type="button" class="v6-picker-item v6-library-item" ${key}="${escapeText(entry.id)}">
+        <span class="v6-library-art" aria-hidden="true">${visual}</span>
+        <span class="v6-library-details"><strong>${escapeText(entry.name)}</strong><small>${escapeText(entry.equipment||entry.category||'Custom exercise')}</small><small class="v6-library-cue">${escapeText(entry.cue||'Your saved custom exercise')}</small></span>
+        <span class="v6-library-tag">${saved?'Saved':'Add'}</span>
+      </button>`;
+    }).join('');
+    const remaining=matches.length-visible;
+    return `<p class="v6-picker-count">${matches.length} matches · ${Math.min(matches.length,visible)} shown</p>
+      ${rows||'<p class="v6-muted">No exercises match. Try another name or create a custom exercise below.</p>'}
+      ${remaining>0?`<button type="button" class="v6-picker-more" data-v6-picker-more>Show more (${remaining} remaining)</button>`:''}`;
   }
+  openModal(`${modalTop('Choose an exercise','Search the full exercise library first')}
+    <div class="v6-picker" id="v6PickerSurface">
+      <label class="v6-field">Training date<input id="v6PickerDate" type="date" value="${escapeText(selected)}" required /></label>
+      <label class="v6-field">Find an exercise<input id="v6PickerSearch" type="search" placeholder="Ab Coaster, wide grip pulldown..." autocomplete="off" /></label>
+      <div class="v6-picker-list" id="v6PickerList" aria-live="polite">${renderPickerResults()}</div>
+      <div class="v6-picker-custom">
+        <p><strong>Can't find your exercise?</strong><span>Create a custom one only when it's missing from the library.</span></p>
+        <button type="button" data-v6-create-custom>+ Create Custom Exercise</button>
+      </div>
+    </div>`);
+  const surface=modalRoot.querySelector('#v6PickerSurface');
+  surface?.querySelector('#v6PickerSearch')?.addEventListener('input',event=>{
+    query=event.target.value;
+    visible=20;
+    surface.querySelector('#v6PickerList').innerHTML=renderPickerResults();
+  });
+  surface?.addEventListener('click',event=>{
+    if(!event.target.closest('[data-v6-picker-more]'))return;
+    event.preventDefault();
+    visible+=20;
+    surface.querySelector('#v6PickerList').innerHTML=renderPickerResults();
+  });
+}
   function editEntry(id){
     const record=data.entries.find(r=>r.id===id);
     if(!record)return;
     const name=exerciseName(record.exerciseId);
     const exercise=exById(record.exerciseId);
     const plateLoad=exercise?.loadType==='plates'||Object.keys(record.plates||{}).length>0;
-    openModal(`${modalTop('Edit logged exercise',name)}<form id="v6EntryForm"><div class="v6-editor-intro">${escapeText(name)} · ${formatNum(record.weight)} lb</div>
+    openModal(`${modalTop('Edit logged exercise',name)}<form id="v6EntryForm"><div class="v6-editor-intro">${escapeText(name)} · ${record.exerciseId==='ab-coaster'&&Number(record.weight)===0?'Bodyweight':formatNum(record.weight)+' lb'}</div>
       <label class="v6-field">Workout date<input id="v6EntryDate" type="date" value="${escapeText(record.date)}" required /></label>
       <div class="v6-two-cols"><label class="v6-field">Sets<input id="v6EntrySets" type="number" min="1" max="100" value="${record.sets||''}" placeholder="3" /></label><label class="v6-field">Reps per set<input id="v6EntryReps" type="number" min="1" max="1000" value="${record.reps||''}" placeholder="10" /></label></div>
-      ${plateLoad?'<p class="v6-editor-tip">This record uses plate loading. Its weight is kept unchanged so the plate breakdown stays accurate.</p>':`<label class="v6-field">Working weight (lb)<input id="v6EntryWeight" type="number" step="0.5" min="0.5" max="100000" value="${Number(record.weight)||0}" required /></label>`}
+      ${plateLoad?'<p class="v6-editor-tip">This record uses plate loading. Its weight is kept unchanged so the plate breakdown stays accurate.</p>':`<label class="v6-field">Working weight (lb)<input id="v6EntryWeight" type="number" step="0.5" min="${record.exerciseId==='ab-coaster'?0:0.5}" max="100000" value="${Number(record.weight)||0}" required /></label>`}
       <label class="v6-field">Notes<textarea id="v6EntryNotes" maxlength="500" rows="3" placeholder="How did it feel?">${escapeText(record.notes||'')}</textarea></label><button type="submit" class="v6-button v6-full">Save workout changes</button><button type="button" class="v6-delete-entry" id="v6DeleteEntry">Delete this entry</button></form>`);
     modalRoot.querySelector('#v6DeleteEntry')?.addEventListener('click',()=>{
       if(!confirm(`Delete the ${record.date} ${name} workout entry? This cannot be undone.`))return;
@@ -202,7 +253,7 @@
       if(!isoDate(date)||!date)return alert('Choose a valid date.');
       if(Boolean(setValue)!==Boolean(repValue))return alert('Enter both sets and reps, or leave both blank.');
       if((setValue&&(!Number.isInteger(sets)||sets<1||sets>100))||(repValue&&(!Number.isInteger(reps)||reps<1||reps>1000)))return alert('Enter valid whole-number sets and reps.');
-      if(!Number.isFinite(Number(weight))||Number(weight)<=0||Number(weight)>100000)return alert('Enter a valid working weight.');
+      if(!Number.isFinite(Number(weight))||Number(weight)<0||(Number(weight)===0&&record.exerciseId!=='ab-coaster')||Number(weight)>100000)return alert('Enter a valid working weight.');
       Object.assign(record,{date,sets:setValue?sets:null,reps:repValue?reps:null,weight:Number(weight),notes:modalRoot.querySelector('#v6EntryNotes')?.value?.trim()||''});
       if(save()){expandedJournalDate=date;selectedJournalDate=date;closeModal();render();notify('Workout entry updated')}
     });
@@ -243,19 +294,31 @@
     if(target.hasAttribute('data-v6-edit-entry')){editEntry(target.dataset.v6EditEntry);return;}
   },true);
   app.addEventListener('change',event=>{
-    if(event.target.id==='v6TrendExercise'){selectedTrendExercise=event.target.value;render()}
+    if(event.target.id==='v6TrendExercise'){selectedTrendExercise=event.target.value;if(selectedTrendExercise==='ab-coaster'&&trendMetric==='load')trendMetric='reps';render()}
     if(event.target.id==='v6TrendRange'){trendWindow=event.target.value;render()}
     if(event.target.id==='v6JournalDate'){if(isoDate(event.target.value))selectedJournalDate=event.target.value;render()}
   },true);
-  modalRoot.addEventListener('click',event=>{
-    const item=event.target.closest('[data-v6-pick-exercise]');
-    const browse=event.target.closest('[data-v6-browse-exercises]');
-    if(!item&&!browse)return;
-    event.preventDefault();event.stopImmediatePropagation();
-    if(item){pendingLogDate=modalRoot.querySelector('#v6PickerDate')?.value||today();if(isoDate(pendingLogDate)){selectedJournalDate=pendingLogDate;expandedJournalDate=pendingLogDate;}const id=item.dataset.v6PickExercise;closeModal();openLog(id);return;}
-    const dt=modalRoot.querySelector('#v6PickerDate')?.value; if(isoDate(dt)){selectedJournalDate=dt;pendingLogDate=dt;}
-    closeModal();tab='exercises';render();scrollTo({top:0,behavior:'instant'});
-    document.querySelector('#catalogSearch')?.focus();
-  },true);
+  modalRoot.addEventListener('click',function(event){
+  const saved=event.target.closest('[data-v6-saved-pick]');
+  const library=event.target.closest('[data-v6-library-pick]');
+  const custom=event.target.closest('[data-v6-create-custom]');
+  if(!saved&&!library&&!custom)return;
+  event.preventDefault();event.stopImmediatePropagation();
+  const pickedDate=modalRoot.querySelector('#v6PickerDate')?.value;
+  const date=isoDate(pickedDate)?pickedDate:today();
+  selectedJournalDate=date;expandedJournalDate=date;
+  closeModal();
+  tab='history';
+  render();
+  if(saved){pendingLogDate=date;openLog(saved.dataset.v6SavedPick);return;}
+  if(library){pendingLogDate=date;window.LiftLogCatalog?.pick(library.dataset.v6LibraryPick);return;}
+  // Only assign the pending date after custom exercise creation succeeds.
+  pendingLogDate=null;
+  openExercise();
+  const addedId=editorState?.id;
+  modalRoot.querySelector('#exerciseForm')?.addEventListener('submit',()=>{
+    if(addedId && exById(addedId))queueMicrotask(()=>{pendingLogDate=date;openLog(addedId);});
+  });
+} ,true);
   render();
 })();

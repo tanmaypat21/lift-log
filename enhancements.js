@@ -46,6 +46,17 @@
     muscles:['lats','biceps']
   };
   if(!existingIds.has(wideGripPulldown.id)){CATALOG.push(wideGripPulldown);existingIds.add(wideGripPulldown.id)}
+  // Ab Coaster uses a kneeling carriage that rises along a curved track.
+  // Zero weight denotes no added resistance; users still record sets and reps.
+  const abCoaster={
+    id:'ab-coaster',name:'Ab Coaster',category:'Core',
+    equipment:'Ab Coaster machine · curved rail & kneeling pad',equipmentGroup:'Machine',
+    cue:'Kneel on the moving pad, support forearms on the handles, and draw knees forward and upward along the curved track.',
+    loadType:'direct',optionalResistance:true,mediaId:'ab-coaster',frames:['start','end'],
+    aliases:['abcoaster','ab coaster machine','abdominal coaster','ab coaster crunch','kneeling ab machine','knee raise coaster','curved track ab machine'],
+    muscles:['abs','obliques']
+  };
+  if(!existingIds.has(abCoaster.id)){CATALOG.push(abCoaster);existingIds.add(abCoaster.id)}
   // Bundled CC0 reference images, from MarvinNazari/exercise-images.
   // Keep the same exercise IDs: users' existing logs must never be re-labelled automatically.
   const MEDIA = {
@@ -119,7 +130,10 @@
   function mark(){if(!Array.isArray(data.cardio))data.cardio=[];if(!data.sharePrefs||typeof data.sharePrefs!=='object')data.sharePrefs={workouts:false,cardio:false,records:false}; if(typeof data.cardioGoal!=='number')data.cardioGoal=0;}
   mark();
   const bundledImages=new Set(Object.values(MEDIA));
-  function mediaPath(id,frame='start') { return bundledImages.has(id)?`./assets/exercises/${id}/${frame}.webp`:`https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/images/${encodeURIComponent(id)}/${frame}.webp`; }
+  function mediaPath(id,frame='start') {
+    if(id==='ab-coaster')return `./assets/exercises/ab-coaster/${frame}.svg`;
+    return bundledImages.has(id)?`./assets/exercises/${id}/${frame}.webp`:`https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/images/${encodeURIComponent(id)}/${frame}.webp`;
+  }
   function figure(ex,large=false){
     const id=MEDIA[ex.id]||ex.mediaId;
     if(!id){return `<div class="exercise-visual visual-fallback" role="img" aria-label="No reference image for ${esc(ex.name)}"><span aria-hidden="true">${esc(categoryIcon(ex.category))}</span><small>Custom exercise</small></div>`;}
@@ -197,14 +211,18 @@
   }
   function catalogCards(){const matches=catalogMatches(),display=matches.slice(0,catalogShown);return `<div class="catalog-results">${matches.length} exercise${matches.length===1?'':'s'} found · showing ${display.length}</div>${matches.length?`<div class="catalog-grid">${display.map(catalogCard).join('')}</div>${matches.length>display.length?`<button class="secondary catalog-more" type="button" data-catalog-more>Show more exercises (${matches.length-display.length} remaining)</button>`:''}`:'<p class="muted-inset">No matches yet. Try a shorter name (e.g. “calves”), a muscle group, or another equipment type.</p>'}`;}
   exercises=function(){return `<div class="page-top"><span class="eyebrow">YOUR WORKOUTS</span><h1>Find your movement.</h1><p class="sub">Search by name, equipment or muscle group. Tap an illustration to identify the exercise.</p></div>
-    <div class="section-header"><h2>My saved exercises <span class="count-inline">${data.exercises.length}</span></h2><button id="addExercise" class="text-action">+ Custom</button></div>
-    <div class="panel list-panel">${data.exercises.map(row).join('')||'<p class="muted-inset">Nothing tracked yet.</p>'}</div>
     <div class="section-header"><h2>Browse ${CATALOG.length} available exercises</h2><span class="hint">Start / finish references</span></div>
      <div class="search-wrap" role="search"><label class="search-label" for="catalogSearch">Search exercises</label><span aria-hidden="true">⌕</span><input id="catalogSearch" type="search" placeholder="Name, machine or muscle..." value="${esc(catalogSearch)}" autocomplete="off"/><button type="button" id="voiceExerciseSearch" class="voice-search-button" aria-label="Search exercises using your voice" aria-pressed="false" title="Speak an exercise name"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5m-4 0h8"/></svg></button></div>
      <p class="voice-status" id="voiceSearchStatus" role="status" aria-live="polite">Tap the microphone to search by speaking, or use keyboard dictation.</p>
     <div class="catalog-filters" role="group" aria-label="Muscle group">${['All','Legs','Chest','Back','Shoulders','Arms','Core','Other'].map(s=>`<button data-catalog-filter="${esc(s)}" class="chip ${catalogFilter===s?'selected':''}">${esc(s)}</button>`).join('')}</div>
     <div class="equipment-filter"><label for="catalogEquipment">Equipment</label><select id="catalogEquipment">${['All','Machine','Cable','Dumbbell','Barbell','Bodyweight','Band','Kettlebell','Other'].map(s=>`<option value="${s}" ${catalogEquipment===s?'selected':''}>${s==='All'?'All equipment':s}</option>`).join('')}</select><small>Exercise images may require internet the first time.</small></div>
-    <div id="catalogResults">${catalogCards()}</div>`;
+    <div id="catalogResults">${catalogCards()}</div>
+    <div class="v61-custom-from-library">
+      <span><strong>Not in the library?</strong><small>Create an exercise with your own name and equipment setup.</small></span>
+      <button id="addExercise" class="secondary" type="button">+ Create Custom Exercise</button>
+    </div>
+    <div class="section-header"><h2>My saved exercises <span class="count-inline">${data.exercises.length}</span></h2><span class="hint">Quick log</span></div>
+    <div class="panel list-panel">${data.exercises.map(row).join('')||'<p class="muted-inset">No saved exercises yet.</p>'}</div>`;
   };
   function shownPoints(id){let rs=entriesFor(id).filter(r=>Number.isFinite(Number(r.weight))&&Number(r.weight)>0);
     if(chartRange!=='all'){const d=new Date();d.setDate(d.getDate()-Number(chartRange));const cutoff=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;rs=rs.filter(r=>r.date>=cutoff)}
@@ -291,7 +309,8 @@
   function pickCatalog(id){const c=CATALOG.find(x=>x.id===id);if(!c)return;const existing=data.exercises.find(x=>x.catalogId===c.id||x.id===c.id||normalizeSearch(x.name)===normalizeSearch(c.name));
     if(existing){if(modalRoot.innerHTML)closeModal();openLog(existing.id);return;}
     const ex={id:c.id,name:c.name,category:c.category,loadType:c.loadType,perSide:false,plates:{},directWeight:0,notes:`${c.equipment}. ${c.cue}`,catalogId:c.id};
-    data.exercises.push(ex);if(save()){if(modalRoot.innerHTML)closeModal();render();notify('Exercise added — set your working weight');openExercise(ex.id)}
+    ex.optionalResistance=!!c.optionalResistance;
+    data.exercises.push(ex);if(save()){if(modalRoot.innerHTML)closeModal();render();notify('Exercise added — log your first set');openLog(ex.id)}
   }
   const VoiceRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
   let recognition=null,voiceActive=false,voiceText='';
@@ -360,5 +379,18 @@
   app.addEventListener('change',e=>{if(e.target.id==='catalogEquipment'){catalogShown=24;catalogEquipment=e.target.value;$('#catalogResults').innerHTML=catalogCards();return;}const p=e.target.closest('[data-share-pref]');if(p){data.sharePrefs[p.dataset.sharePref]=p.checked;save();render()}},true);
   modalRoot.addEventListener('click',e=>{const pick=e.target.closest('[data-pick-catalog]');if(pick){e.stopImmediatePropagation();pickCatalog(pick.dataset.pickCatalog)}},true);
   const header=document.querySelector('.topbar');const settingsButton=document.createElement('button');settingsButton.className='settings-access';settingsButton.title='Settings & backups';settingsButton.setAttribute('aria-label','Settings & backups');settingsButton.innerHTML='⚙';header.append(settingsButton);settingsButton.addEventListener('click',()=>{tab='settings';render();window.scrollTo(0,0)});
+  // Public read-only catalog adapter for the workout-first selection sheet.
+  // Internal exercise IDs and the existing local storage schema stay unchanged.
+  window.LiftLogCatalog=Object.freeze({
+    list:()=>CATALOG.slice(),
+    search:(query='')=>{
+      const phrase=normalizeSearch(query);
+      return CATALOG.map((entry,i)=>({entry,i,score:catalogScore(entry,phrase)}))
+        .filter(result=>result.score>0)
+        .sort((a,b)=>b.score-a.score||a.i-b.i).map(result=>result.entry);
+    },
+    visual:(entry)=>figure(entry),
+    pick:(id)=>pickCatalog(id)
+  });
   render();
 })();

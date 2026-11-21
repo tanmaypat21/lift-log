@@ -1,3 +1,28 @@
+# Lift Log v0.6.1 — Search before logging + Ab Coaster
+
+## New workout flow
+
+- The Home **+ Log** button and Journal **+ Log exercise** actions now open the **full exercise library** first, with a searchable list of all available exercises and saved movements surfaced first.
+- The chosen workout **date is carried through** to the new workout entry.
+- If a movement does not exist, use the separate **+ Create Custom Exercise** action at the bottom of the picker. After saving that custom exercise, the log form opens automatically.
+- The Train tab also places exercise search above the saved-exercise list and provides a clearly separated Custom Exercise button.
+
+## Ab Coaster
+
+- Added **Ab Coaster** to the Core / Machine category with searchable aliases and original, purpose-drawn start/end vector references showing the distinctive curved track, kneeling pad and handles.
+- On an Ab Coaster, **0 lb represents zero added resistance**, not the user's bodyweight. Log sets and reps to track unweighted sessions, or enter extra resistance if the machine uses it.
+- The progress chart now offers a **Reps** metric, useful for exercises performed without added weight. Individual weighted-load and volume metrics remain available for weighted exercises.
+- The motion cue reflects the manufacturer's explanation: keep the upper body steady and draw the knee carriage forward along the curved track using the abdominal muscles.
+
+## Data and privacy
+
+- No migrations or resets of existing exercises, entries, cardio logs, goals, coach history or saved weights.
+- Browser local storage still uses `liftlog.v1`; please export periodic backups.
+- Exercise images are for recognizing equipment and movement, not substitutes for instruction or medical guidance.
+- Existing friends, AI coaching and wearable features are unchanged.
+
+---
+
 # Lift Log v0.6 — Progress first + dated workout journal
 
 ## What changed
