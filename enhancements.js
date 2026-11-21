@@ -62,6 +62,17 @@
     ["ez-bar-curl","EZ-Bar Biceps Curl","Arms","EZ curl bar","curl","Curl angled EZ bar with elbows near torso.","direct"],
     ["alternating-dumbbell-curl","Alternating Dumbbell Curl","Arms","Dumbbells","curl","Curl one arm at a time, often rotating palm upward.","direct"],
     ["barbell-curl","Barbell Biceps Curl","Arms","Straight barbell","curl","Curl bar upward with palms facing up and minimal swinging.","direct"]
+,
+    ["chest-press-machine","Machine Chest Press","Chest","Seated chest press machine","bench","Push chest-level machine handles forward.","direct"],
+    ["dumbbell-chest-press","Flat Dumbbell Chest Press","Chest","Flat bench · dumbbells","bench","Press dumbbells upward from chest height.","direct"],
+    ["plate-loaded-incline-chest-press","Plate-Loaded Incline Chest Press","Chest","Incline chest press · plates","incline","Press handles diagonally upward against plates.","plates"],
+    ["dumbbell-shoulder-press","Dumbbell Shoulder Press","Shoulders","Bench · dumbbells","overhead","Press dumbbells upward from shoulder height.","direct"],
+    ["shoulder-press-machine","Machine Shoulder Press","Shoulders","Seated overhead press machine","overhead","Press handles overhead from shoulder height.","direct"],
+    ["rear-delt-fly","Rear Delt Fly","Shoulders","Reverse pec deck or dumbbells","fly","Move arms outward/backward to train rear shoulders.","direct"],
+    ["machine-lateral-raise","Machine Lateral Raise","Shoulders","Side-delt machine","fly","Raise upper arms outward against machine pads.","direct"],
+    ["standing-leg-curl-machine","Standing Leg Curl Machine","Legs","Standing hamstring curl machine","lyingcurl","Bend one knee and pull lower leg backward toward glutes.","direct"],
+    ["hack-squat","Hack Squat","Legs","Hack squat machine · plates","squat","Squat with torso supported on angled sled.","plates"],
+    ["leg-press-moving-plate","Seated Leg Press (Moving Plate)","Legs","Seated leg press · moving footplate","presslegs","Press the footplate away while seated; check machine loading.","direct"]
   ].map(([id,name,category,equipment,pose,cue,loadType]) => ({id,name,category,equipment,pose,cue,loadType}));
   // Bundled CC0 reference images, from MarvinNazari/exercise-images.
   // Keep the same exercise IDs: users' existing logs must never be re-labelled automatically.
@@ -80,6 +91,7 @@
   };
   Object.assign(MEDIA, {"wide-grip-lat-pulldown":"lat-pulldown","close-grip-lat-pulldown":"close-grip-lat-pulldown","reverse-grip-lat-pulldown":"reverse-grip-lat-pulldown","straight-arm-pulldown":"straight-arm-pulldown","machine-high-row":"machine-high-row","machine-row":"machine-row","chest-supported-t-bar-row":"chest-supported-t-bar-row","chest-supported-dumbbell-row":"chest-supported-dumbbell-row","t-bar-row":"t-bar-row","single-arm-cable-row":"single-arm-cable-row","assisted-pull-up":"assisted-pull-up","reverse-grip-barbell-row":"reverse-grip-barbell-row","wide-grip-pull-up":"wide-grip-pull-up","neutral-grip-pull-up":"neutral-grip-pull-up"});
   Object.assign(MEDIA, {"preacher-curl":"preacher-curl","machine-preacher-curl":"machine-preacher-curl","dumbbell-preacher-curl":"dumbbell-preacher-curl","incline-dumbbell-curl":"incline-dumbbell-curl","hammer-curl":"hammer-curls","cross-body-hammer-curl":"cross-body-hammer-curl","rope-hammer-curl":"rope-hammer-curl","cable-curl":"cable-curl","single-arm-cable-curl":"single-arm-cable-curl","concentration-curl":"concentration-curl","spider-curl":"spider-curl","reverse-curl":"reverse-curl","ez-bar-curl":"ez-bar-curl","alternating-dumbbell-curl":"alternating-dumbbell-curl","barbell-curl":"barbell-curl"});
+  Object.assign(MEDIA, {"chest-press-machine":"chest-press-machine","dumbbell-chest-press":"dumbbell-chest-press","plate-loaded-incline-chest-press":"plate-loaded-incline-chest-press","dumbbell-shoulder-press":"dumbbell-shoulder-press","shoulder-press-machine":"shoulder-press-machine","rear-delt-fly":"rear-delt-fly","machine-lateral-raise":"machine-lateral-raise","standing-leg-curl-machine":"standing-leg-curl-machine","hack-squat":"hack-squat","leg-press-moving-plate":"leg-press-moving-plate"});
   const ALIASES = {
     'calf-raises':['calves','calf machine','heel raises','toe raises','calf raises'],
     'standing-calf-raise':['standing calves','standing calf','calf raise machine','standing heel raise','calves machine','machine calves'],
