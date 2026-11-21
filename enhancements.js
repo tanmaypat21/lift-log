@@ -35,6 +35,17 @@
   // Extra exercises contain offline searchable metadata; only displayed images may need internet.
   const existingIds=new Set(CATALOG.map(c=>c.id));
   for(const entry of window.LIFTLOG_LIBRARY||[]){if(!existingIds.has(entry.id)){CATALOG.push(entry);existingIds.add(entry.id)}}
+  // Wide pronated-bar pulldowns are distinct from narrow and underhand grips.
+  // The image uses the already bundled wide-bar lat-pulldown example.
+  const wideGripPulldown={
+    id:'wide-grip-lat-pulldown',name:'Wide-Grip Lat Pulldown',category:'Back',
+    equipment:'Wide overhand bar · cable tower',equipmentGroup:'Cable',
+    cue:'Hands wider than shoulders on an overhand bar; pull toward your upper chest.',
+    loadType:'direct',mediaId:'lat-pulldown',frames:['start','end'],
+    aliases:['wide grip pull downs','wide grip pulldown','wide grip pull down','wide lat pulldown','wide lat pull','wide bar pull down','wide grip back pulldown'],
+    muscles:['lats','biceps']
+  };
+  if(!existingIds.has(wideGripPulldown.id)){CATALOG.push(wideGripPulldown);existingIds.add(wideGripPulldown.id)}
   // Bundled CC0 reference images, from MarvinNazari/exercise-images.
   // Keep the same exercise IDs: users' existing logs must never be re-labelled automatically.
   const MEDIA = {
@@ -80,6 +91,7 @@
     'plank':['front plank','ab plank'],
     'cable-crunch':['kneeling cable crunch','rope crunch']
   };
+  const EXERCISE_DIFFERENCES = {"wide-grip-lat-pulldown":"A wider overhand grip changes your pulling angles. It does not isolate a completely separate back muscle.","close-grip-lat-pulldown":"A narrower handle lets the elbows travel nearer your sides. Log it separately from the wide-grip version.","preacher-curl":"The upper arm is supported in front of your torso. This setup differs from standing barbell curls.","machine-preacher-curl":"The elbow position is similar to free-weight preacher curls, but the machine's resistance curve differs.","incline-dumbbell-curl":"Arms begin behind your torso, training the biceps from a relatively lengthened position.","hammer-curls":"The palms-in grip recruits brachialis and brachioradialis along with the biceps.","cross-body-hammer-curl":"The cross-body, neutral-grip path is a useful alternative, not a way to isolate a single head.","spider-curl":"Upper arms hang in front while your chest is supported, unlike incline curls.","reverse-curl":"Palms-down curls increase forearm demand and change elbow-flexor recruitment."};
   const POSES = {
     presslegs:{head:[45,47],body:'M43 57 L65 75 L86 68 M65 75 L92 44 L112 37 M65 75 L80 88',gear:'<path d="M118 20l19 32M111 30l20 12M15 93h60M66 87l-22 10"/>'},
     calf:{head:[76,25],body:'M76 34 L75 65 L67 87 L67 96 M75 65 L89 87 L94 94 M75 43 L56 55 M75 43 L95 55',gear:'<path d="M55 99h60M54 56h7M91 56h11"/>'},
@@ -152,7 +164,7 @@
       ${latest.length?`<div class="section-header"><h2>Recent lifts</h2><button class="text-action" data-tab="history">History →</button></div><div class="panel recent-panel">${latest.map(historyRow).join('')}</div>`:''}`;
   };
   function catalogCard(c){
-    const own=data.exercises.find(e=>e.catalogId===c.id||e.id===c.id);
+    const own=data.exercises.find(e=>e.catalogId===c.id||e.id===c.id||normalizeSearch(e.name)===normalizeSearch(c.name));
     const ambiguous=c.id==='calf-raises'||c.id==='leg-curl';
     const label=ambiguous?'Choose type':own?'Log':'Add +';
     const action=ambiguous?`data-exercise-info="${esc(c.id)}"`:`data-pick-catalog="${esc(c.id)}"`;
@@ -273,9 +285,9 @@
       }).join('')}</div><button class="secondary full" data-pick-catalog="${esc(c.id)}">Keep as ${esc(c.name)} (unspecified)</button>`);
       return;
     }
-    openModal(`${modalTop(c.name,c.category+' · '+c.equipment)}<div class="detail-figure">${figure(c,true)}</div><p class="detail-cue"><strong>How to recognize it:</strong> ${esc(c.cue)}</p><p class="smallprint">Images are visual identification aids, not professional form instructions. Machine designs vary.</p><button class="primary full" data-pick-catalog="${esc(c.id)}">${data.exercises.some(e=>e.catalogId===c.id||e.id===c.id)?'Log this exercise':'Add to my exercises'}</button>`);
+    openModal(`${modalTop(c.name,c.category+' · '+c.equipment)}<div class="detail-figure">${figure(c,true)}</div><p class="detail-cue"><strong>How to recognize it:</strong> ${esc(c.cue)}</p>${EXERCISE_DIFFERENCES[c.id]?`<p class="detail-cue"><strong>What is different:</strong> ${esc(EXERCISE_DIFFERENCES[c.id])}</p>`:""}<p class="smallprint">Images are visual identification aids, not professional form instructions. Machine designs vary.</p><button class="primary full" data-pick-catalog="${esc(c.id)}">${data.exercises.some(e=>e.catalogId===c.id||e.id===c.id||normalizeSearch(e.name)===normalizeSearch(c.name))?'Log this exercise':'Add to my exercises'}</button>`);
   }
-  function pickCatalog(id){const c=CATALOG.find(x=>x.id===id);if(!c)return;const existing=data.exercises.find(x=>x.catalogId===c.id||x.id===c.id);
+  function pickCatalog(id){const c=CATALOG.find(x=>x.id===id);if(!c)return;const existing=data.exercises.find(x=>x.catalogId===c.id||x.id===c.id||normalizeSearch(x.name)===normalizeSearch(c.name));
     if(existing){if(modalRoot.innerHTML)closeModal();openLog(existing.id);return;}
     const ex={id:c.id,name:c.name,category:c.category,loadType:c.loadType,perSide:false,plates:{},directWeight:0,notes:`${c.equipment}. ${c.cue}`,catalogId:c.id};
     data.exercises.push(ex);if(save()){if(modalRoot.innerHTML)closeModal();render();notify('Exercise added — set your working weight');openExercise(ex.id)}
