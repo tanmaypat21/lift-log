@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 320 240" role="img" aria-label="Ab Coaster start: kneeling on a padded carriage that slides along a curved rail toward the chest"><defs>
+<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1c3041"/><stop offset="1" stop-color="#10202e"/></linearGradient>
+<linearGradient id="rail" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#b1c3ce"/><stop offset=".5" stop-color="#617d92"/><stop offset="1" stop-color="#4b657a"/></linearGradient>
+<marker id="arrow" markerWidth="9" markerHeight="9" refX="5.5" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="none" stroke="#9ef5a8" stroke-width="1.6"/></marker>
+</defs>
+<rect width="320" height="240" rx="18" fill="url(#bg)"/>
+<path d="M28 218H295" stroke="#33475a" stroke-width="3" stroke-linecap="round"/>
+<!-- Feet, upright and curved guide track: distinctive Ab Coaster machine shape -->
+<path d="M48 214H117 M216 214H287" stroke="#566e81" stroke-width="10" stroke-linecap="round"/>
+<path d="M68 210L78 88" stroke="#7d95a7" stroke-width="13" stroke-linecap="round"/>
+<path d="M82 103C109 162 161 205 262 197" stroke="#374a5c" stroke-width="15" fill="none" stroke-linecap="round"/>
+<path d="M82 103C109 162 161 205 262 197" stroke="url(#rail)" stroke-width="8" fill="none" stroke-linecap="round"/>
+<path d="M65 86L98 85" stroke="#8297a7" stroke-width="11" stroke-linecap="round"/>
+<rect x="51" y="69" width="52" height="16" rx="7" fill="#506a7d" stroke="#9ab2c2" stroke-width="2"/>
+<path d="M62 72L53 54 M93 72L103 52" stroke="#8ba5b4" stroke-width="8" stroke-linecap="round"/>
+<circle cx="77" cy="197" r="12" fill="#263b4b" stroke="#8197a8" stroke-width="4"/>
+<g stroke-linecap="round" stroke-linejoin="round">
+<path d="M213 202h41" stroke="#7d94a4" stroke-width="9"/>
+<rect x="206" y="182" width="49" height="17" rx="8" fill="#425e70" stroke="#b2c4d0" stroke-width="2"/>
+<circle cx="232" cy="201" r="13" fill="#243646" stroke="#96aab9" stroke-width="4"/>
+<!-- Stable upper body and bent knees on moving carriage -->
+<circle cx="150" cy="42" r="14" fill="#d8e4ec"/>
+<path d="M146 59L158 105L180 132" stroke="#d8e4ec" stroke-width="20" fill="none"/>
+<path d="M153 78L118 89L90 71" stroke="#d8e4ec" stroke-width="12" fill="none"/>
+<path d="M180 132L226 181L242 185" stroke="#d8e4ec" stroke-width="15" fill="none"/>
+<path d="M242 185L250 194" stroke="#b1c9d9" stroke-width="9" fill="none"/>
+<path d="M126 89L111 80" stroke="#9eb4c4" stroke-width="5"/>
+</g><path d="M250 156Q223 135 191 133" stroke="#9ef5a8" stroke-width="3.8" fill="none" marker-end="url(#arrow)" stroke-dasharray="8 5"/><rect x="15" y="13" width="99" height="24" rx="12" fill="#0d1d2a" opacity=".85"/><text x="64" y="29.2" text-anchor="middle" fill="#b1ffbd" font-size="13" font-family="Arial,Helvetica,sans-serif" font-weight="700">START</text></svg>
