@@ -46,6 +46,17 @@
     muscles:['lats','biceps']
   };
   if(!existingIds.has(wideGripPulldown.id)){CATALOG.push(wideGripPulldown);existingIds.add(wideGripPulldown.id)}
+  // Ab Coaster uses a kneeling carriage that rises along a curved track.
+  // Zero weight denotes no added resistance; users still record sets and reps.
+  const abCoaster={
+    id:'ab-coaster',name:'Ab Coaster',category:'Core',
+    equipment:'Ab Coaster machine · curved rail & kneeling pad',equipmentGroup:'Machine',
+    cue:'Kneel on the moving pad, support forearms on the handles, and draw knees forward and upward along the curved track.',
+    loadType:'direct',optionalResistance:true,mediaId:'ab-coaster',frames:['start','end'],
+    aliases:['abcoaster','ab coaster machine','abdominal coaster','ab coaster crunch','kneeling ab machine','knee raise coaster','curved track ab machine'],
+    muscles:['abs','obliques']
+  };
+  if(!existingIds.has(abCoaster.id)){CATALOG.push(abCoaster);existingIds.add(abCoaster.id)}
   // Bundled CC0 reference images, from MarvinNazari/exercise-images.
   // Keep the same exercise IDs: users' existing logs must never be re-labelled automatically.
   const MEDIA = {
@@ -119,7 +130,10 @@
   function mark(){if(!Array.isArray(data.cardio))data.cardio=[];if(!data.sharePrefs||typeof data.sharePrefs!=='object')data.sharePrefs={workouts:false,cardio:false,records:false}; if(typeof data.cardioGoal!=='number')data.cardioGoal=0;}
   mark();
   const bundledImages=new Set(Object.values(MEDIA));
-  function mediaPath(id,frame='start') { return bundledImages.has(id)?`./assets/exercises/${id}/${frame}.webp`:`https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/images/${encodeURIComponent(id)}/${frame}.webp`; }
+  function mediaPath(id,frame='start') {
+    if(id==='ab-coaster')return `./assets/exercises/ab-coaster/${frame}.svg`;
+    return bundledImages.has(id)?`./assets/exercises/${id}/${frame}.webp`:`https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/images/${encodeURIComponent(id)}/${frame}.webp`;
+  }
   function figure(ex,large=false){
     const id=MEDIA[ex.id]||ex.mediaId;
     if(!id){return `<div class="exercise-visual visual-fallback" role="img" aria-label="No reference image for ${esc(ex.name)}"><span aria-hidden="true">${esc(categoryIcon(ex.category))}</span><small>Custom exercise</small></div>`;}
@@ -291,7 +305,8 @@
   function pickCatalog(id){const c=CATALOG.find(x=>x.id===id);if(!c)return;const existing=data.exercises.find(x=>x.catalogId===c.id||x.id===c.id||normalizeSearch(x.name)===normalizeSearch(c.name));
     if(existing){if(modalRoot.innerHTML)closeModal();openLog(existing.id);return;}
     const ex={id:c.id,name:c.name,category:c.category,loadType:c.loadType,perSide:false,plates:{},directWeight:0,notes:`${c.equipment}. ${c.cue}`,catalogId:c.id};
-    data.exercises.push(ex);if(save()){if(modalRoot.innerHTML)closeModal();render();notify('Exercise added — set your working weight');openExercise(ex.id)}
+    ex.optionalResistance=!!c.optionalResistance;
+    data.exercises.push(ex);if(save()){if(modalRoot.innerHTML)closeModal();render();notify('Exercise added — log your first set');openLog(ex.id)}
   }
   const VoiceRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
   let recognition=null,voiceActive=false,voiceText='';
@@ -360,5 +375,18 @@
   app.addEventListener('change',e=>{if(e.target.id==='catalogEquipment'){catalogShown=24;catalogEquipment=e.target.value;$('#catalogResults').innerHTML=catalogCards();return;}const p=e.target.closest('[data-share-pref]');if(p){data.sharePrefs[p.dataset.sharePref]=p.checked;save();render()}},true);
   modalRoot.addEventListener('click',e=>{const pick=e.target.closest('[data-pick-catalog]');if(pick){e.stopImmediatePropagation();pickCatalog(pick.dataset.pickCatalog)}},true);
   const header=document.querySelector('.topbar');const settingsButton=document.createElement('button');settingsButton.className='settings-access';settingsButton.title='Settings & backups';settingsButton.setAttribute('aria-label','Settings & backups');settingsButton.innerHTML='⚙';header.append(settingsButton);settingsButton.addEventListener('click',()=>{tab='settings';render();window.scrollTo(0,0)});
+  // Public read-only catalog adapter for the workout-first selection sheet.
+  // Internal exercise IDs and the existing local storage schema stay unchanged.
+  window.LiftLogCatalog=Object.freeze({
+    list:()=>CATALOG.slice(),
+    search:(query='')=>{
+      const phrase=normalizeSearch(query);
+      return CATALOG.map((entry,i)=>({entry,i,score:catalogScore(entry,phrase)}))
+        .filter(result=>result.score>0)
+        .sort((a,b)=>b.score-a.score||a.i-b.i).map(result=>result.entry);
+    },
+    visual:(entry)=>figure(entry),
+    pick:(id)=>pickCatalog(id)
+  });
   render();
 })();
