@@ -1,3 +1,27 @@
+# Lift Log v0.4.2 — Expanded exercise library
+
+This release expands the built-in gallery **from 28 to 67 exercises**, with independently tracked grip, machine, and curl variations.
+
+## Notable new exercises
+
+- **Back:** Wide-grip, close-grip and underhand lat pulldowns; straight-arm cable pulldown; supported T-bar/dumbbell rows; machine high row; machine row; single-arm cable row; assisted and alternate-grip pull-ups
+- **Biceps:** Preacher curl (bar), preacher curl machine, dumbbell preacher curl; incline dumbbell curl; hammer, cross-body hammer and rope hammer curls; spider, concentration, reverse, EZ-bar, cable and alternating curls
+- **Other:** Machine chest press, dumbbell bench press, incline machine press, machine/dumbbell shoulder press, rear-delt fly, machine lateral raise, standing leg curl, hack squat, and seated leg press
+
+Exercises have clearer equipment descriptions and movement cues. Grip and shoulder position can shift muscle emphasis but no curl variation precisely isolates a particular biceps head.
+
+## Usage and compatibility
+
+- Search or use the microphone for phrases like "wide grip pull downs", "preacher curls", "incline curl", "neutral grip lat pulldown", and "hammer curls."
+- The gallery initially displays 24 cards with a **Show more exercises** option; muscle filters and searches help find variations faster.
+- **Existing workout histories and exercise IDs are untouched.** Saved custom exercises with the same name as a new catalog item are recognized rather than silently duplicated (e.g., Preacher Curl).
+- The 38 new reference image categories use public-domain exercise illustrations from [MarvinNazari/exercise-images](https://github.com/MarvinNazari/exercise-images), CC0-1.0. They need an internet connection on first view; viewed images may be cached for later use. Original 53 locally bundled image files remain available.
+- These illustrations are AI-generated identification aids, not verified technique instructions. Machine designs and grip widths vary.
+- No live AI model, workout syncing, wearable access, or live social groups were added in this release.
+- Export a JSON backup before testing updates. No account or cloud storage is used.
+
+---
+
 # Lift Log v0.4.1 — Exercise identification & voice search
 
 - The gallery now uses **actual start/end movement reference images** rather than stick figures. Images are stored with the app, load offline after caching, and have short cues explaining the equipment and motion. On opening an exercise, Start and Finish pictures appear alongside identification text.
