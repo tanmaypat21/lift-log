@@ -6,9 +6,9 @@
     ['leg-press','Leg Press','Legs','Leg press machine','presslegs','Push the platform away with control.','plates'],
     ['calf-raises','Calf Raises','Legs','Calf raise machine','calf','Rise onto the balls of your feet.','plates'],
     ['leg-curl','Hamstring Leg Curl','Legs','Leg curl machine (variation unspecified)','seatedcurl','Curl your lower legs against resistance. Select seated or lying if known.','direct'],
-    ['seated-leg-curl','Seated Leg Curl','Legs','Seated curl machine','seatedcurl','Curl your lower legs against the pads.','direct'],
-    ['lying-leg-curl','Lying Leg Curl','Legs','Lying curl machine','lyingcurl','Bend the knees while keeping hips stable.','direct'],
-    ['leg-extension','Leg Extension','Legs','Leg extension machine','seatedcurl','Straighten your knees smoothly.','direct'],
+    ['seated-leg-curl','Seated Leg Curl','Legs','Seated curl machine','seatedcurl','Hamstrings: bend the knee to draw the ankle pad down and back.','direct'],
+    ['lying-leg-curl','Lying Leg Curl','Legs','Lying curl machine','lyingcurl','Hamstrings: lying face down, curl the padded roller toward your glutes.','direct'],
+    ['leg-extension','Leg Extension','Legs','Leg extension machine','seatedcurl','Quads: straighten the knee to raise the shin pad upward.','direct'],
     ['squat','Barbell Squat','Legs','Barbell + rack','squat','Squat to a controlled depth.','direct'],
     ['rdl','Romanian Deadlift','Legs','Barbell or dumbbells','hinge','Hinge through the hips; keep load close.','direct'],
     ['lunge','Walking Lunge','Legs','Dumbbells or bodyweight','lunge','Take a step and lower under control.','direct'],
@@ -32,6 +32,9 @@
     ['seated-calf-raise','Seated Calf Raise','Legs','Seated calf raise machine','calf','Sit with padded resistance across thighs; raise your heels from the foot platform.','direct'],
     ['leg-press-calf-raise','Leg Press Calf Raise','Legs','Leg press machine','presslegs','Sit in a leg press; keep knees nearly still as the balls of your feet move the sled.','plates']
   ].map(([id,name,category,equipment,pose,cue,loadType]) => ({id,name,category,equipment,pose,cue,loadType}));
+  // Extra exercises contain offline searchable metadata; only displayed images may need internet.
+  const existingIds=new Set(CATALOG.map(c=>c.id));
+  for(const entry of window.LIFTLOG_LIBRARY||[]){if(!existingIds.has(entry.id)){CATALOG.push(entry);existingIds.add(entry.id)}}
   // Bundled CC0 reference images, from MarvinNazari/exercise-images.
   // Keep the same exercise IDs: users' existing logs must never be re-labelled automatically.
   const MEDIA = {
@@ -97,20 +100,21 @@
     curl:{head:[75,24],body:'M75 35L77 65L67 96 M77 65L89 96 M75 43L58 59L68 44 M77 43L96 60L86 44',gear:'<path d="M60 40h31M61 36v9M90 36v9"/>'}
   };
   const cateColor={Legs:'#9cf4af',Chest:'#b4c2ff',Back:'#8cd7f5',Shoulders:'#f3c79a',Arms:'#d7b7fb',Core:'#ebc7f0'};
-  let catalogFilter='All',catalogSearch='',chartRange='all',chartMetric='load';
+  let catalogFilter='All',catalogSearch='',catalogEquipment='All',catalogShown=24,chartRange='all',chartMetric='load';
   const htmlNum=n => fmt(Number(n)||0);
   const $ = (s,root=document) => root.querySelector(s);
   function mark(){if(!Array.isArray(data.cardio))data.cardio=[];if(!data.sharePrefs||typeof data.sharePrefs!=='object')data.sharePrefs={workouts:false,cardio:false,records:false}; if(typeof data.cardioGoal!=='number')data.cardioGoal=0;}
   mark();
-  function mediaPath(id,frame='start') { return `./assets/exercises/${id}/${frame}.webp`; }
+  const bundledImages=new Set(Object.values(MEDIA));
+  function mediaPath(id,frame='start') { return bundledImages.has(id)?`./assets/exercises/${id}/${frame}.webp`:`https://raw.githubusercontent.com/MarvinNazari/exercise-images/main/images/${encodeURIComponent(id)}/${frame}.webp`; }
   function figure(ex,large=false){
-    const id=MEDIA[ex.id];
+    const id=MEDIA[ex.id]||ex.mediaId;
     if(!id){return `<div class="exercise-visual visual-fallback" role="img" aria-label="No reference image for ${esc(ex.name)}"><span aria-hidden="true">${esc(categoryIcon(ex.category))}</span><small>Custom exercise</small></div>`;}
     if(ex.id==='calf-raises'){
       const parts=[['standing-calf-raise-machine','Standing'],['seated-calf-raise-machine','Seated'],['leg-press-calf-raise','Leg press']];
       return `<div class="exercise-visual calf-variations ${large?'is-large':''}" role="group" aria-label="Three different calf raise variations">${parts.map(([source,label])=>`<div><img src="${mediaPath(source)}" alt="${esc(label)} calf raise example" loading="lazy" decoding="async"/><small>${esc(label)}</small></div>`).join('')}</div>`;
     }
-    const hold=id==='plank',first=hold?'hold':'start';
+    const hold=ex.frames?.length===1&&ex.frames[0]==='hold'||id==='plank',first=hold?'hold':'start';
     if(!large){return `<div class="exercise-visual" role="img" aria-label="${esc(ex.name)} reference illustration"><img src="${mediaPath(id,first)}" alt="" loading="lazy" decoding="async"/><span class="visual-indicator" aria-hidden="true">${hold?'Hold':'View movement'}</span></div>`;}
     return `<div class="exercise-motion-frames" role="group" aria-label="${esc(ex.name)} movement illustrations">
        <figure><img src="${mediaPath(id,first)}" alt="${esc(ex.name)} ${hold?'hold':'starting position'}" loading="eager"/><figcaption>${hold?'Position':'Start'}</figcaption></figure>
@@ -153,13 +157,14 @@
     const label=ambiguous?'Choose type':own?'Log':'Add +';
     const action=ambiguous?`data-exercise-info="${esc(c.id)}"`:`data-pick-catalog="${esc(c.id)}"`;
     const cue=ambiguous?(c.id==='calf-raises'?'Choose standing, seated or leg-press style.':'Choose seated or lying style, if known.'):c.cue;
-    return `<article class="catalog-card"><button type="button" class="catalog-art" data-exercise-info="${esc(c.id)}" aria-label="View ${esc(c.name)} start and finish images">${figure(c)}</button><div class="catalog-copy"><strong>${esc(c.name)}</strong><span>${esc(c.equipment)}</span><p class="catalog-cue">${esc(cue)}</p><div class="catalog-tags"><small>${esc(c.category)}</small></div></div><button class="catalog-action ${own?'existing':''}" ${action} aria-label="${esc(label)}: ${esc(c.name)}">${esc(label)}</button></article>`;
+    const primary=c.muscles?.length?` · ${c.muscles.slice(0,2).map(x=>x.replace(/_/g,' ')).join(', ')}`:'';
+    return `<article class="catalog-card"><button type="button" class="catalog-art" data-exercise-info="${esc(c.id)}" aria-label="View ${esc(c.name)} start and finish images">${figure(c)}</button><div class="catalog-copy"><strong>${esc(c.name)}</strong><span>${esc(c.equipment)}</span><p class="catalog-cue">${esc(cue)}</p><div class="catalog-tags"><small>${esc(c.category+primary)}</small></div></div><button class="catalog-action ${own?'existing':''}" ${action} aria-label="${esc(label)}: ${esc(c.name)}">${esc(label)}</button></article>`;
   }
   function normalizeSearch(x){return String(x||'').toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();}
   function catalogScore(c,phrase){
     if(!phrase)return 1;
-    const name=normalizeSearch(c.name),aliases=(ALIASES[c.id]||[]).map(normalizeSearch);
-    const misc=normalizeSearch(`${c.category} ${c.equipment} ${c.cue}`);
+    const name=normalizeSearch(c.name),aliases=[...(ALIASES[c.id]||[]),...(c.aliases||[])].map(normalizeSearch);
+    const misc=normalizeSearch(`${c.category} ${c.equipment} ${c.cue} ${(c.muscles||[]).join(' ')} ${c.equipmentGroup||''}`);
     if(name===phrase)return 100;
     if(aliases.includes(phrase))return 96;
     if(name.startsWith(phrase))return 83;
@@ -170,20 +175,22 @@
     const all=[name,...aliases,misc].join(' ');
     return phrase.split(' ').every(t=>all.includes(t))?20:0;
   }
+  function equipmentOf(c){if(c.equipmentGroup)return c.equipmentGroup;const t=normalizeSearch(c.equipment);if(t.includes('cable'))return 'Cable';if(t.includes('dumbbell'))return 'Dumbbell';if(t.includes('barbell'))return 'Barbell';if(t.includes('kettlebell'))return 'Kettlebell';if(t.includes('band'))return 'Band';if(t.includes('machine')||t.includes('smith')||t.includes('pec deck'))return 'Machine';if(t.includes('bodyweight')||t==='floor'||t==='mat')return 'Bodyweight';return 'Other'}
   function catalogMatches(){const query=normalizeSearch(catalogSearch);
-    return CATALOG.filter(c=>catalogFilter==='All'||c.category===catalogFilter)
+    return CATALOG.filter(c=>(catalogFilter==='All'||c.category===catalogFilter)&&(catalogEquipment==='All'||equipmentOf(c)===catalogEquipment))
       .map((c,i)=>({c,i,score:catalogScore(c,query)}))
       .filter(x=>x.score>0)
       .sort((a,b)=>b.score-a.score||a.i-b.i).map(x=>x.c);
   }
-  function catalogCards(){const matches=catalogMatches();return `<div class="catalog-results">${matches.length} exercise${matches.length===1?'':'s'} found</div>${matches.length?`<div class="catalog-grid">${matches.map(catalogCard).join('')}</div>`:'<p class="muted-inset">No matches yet. Try a shorter name (e.g. “calves”), or describe the machine.</p>'}`;}
+  function catalogCards(){const matches=catalogMatches(),display=matches.slice(0,catalogShown);return `<div class="catalog-results">${matches.length} exercise${matches.length===1?'':'s'} found · showing ${display.length}</div>${matches.length?`<div class="catalog-grid">${display.map(catalogCard).join('')}</div>${matches.length>display.length?`<button class="secondary catalog-more" type="button" data-catalog-more>Show more exercises (${matches.length-display.length} remaining)</button>`:''}`:'<p class="muted-inset">No matches yet. Try a shorter name (e.g. “calves”), a muscle group, or another equipment type.</p>'}`;}
   exercises=function(){return `<div class="page-top"><span class="eyebrow">YOUR WORKOUTS</span><h1>Find your movement.</h1><p class="sub">Search by name, equipment or muscle group. Tap an illustration to identify the exercise.</p></div>
     <div class="section-header"><h2>My exercises <span class="count-inline">${data.exercises.length}</span></h2><button id="addExercise" class="text-action">+ Custom</button></div>
     <div class="panel list-panel">${data.exercises.map(row).join('')||'<p class="muted-inset">Nothing tracked yet.</p>'}</div>
-    <div class="section-header"><h2>Browse exercise gallery</h2><span class="hint">Start / finish references</span></div>
+    <div class="section-header"><h2>Browse ${CATALOG.length} exercises</h2><span class="hint">Start / finish references</span></div>
      <div class="search-wrap" role="search"><label class="search-label" for="catalogSearch">Search exercises</label><span aria-hidden="true">⌕</span><input id="catalogSearch" type="search" placeholder="Name, machine or muscle..." value="${esc(catalogSearch)}" autocomplete="off"/><button type="button" id="voiceExerciseSearch" class="voice-search-button" aria-label="Search exercises using your voice" aria-pressed="false" title="Speak an exercise name"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5m-4 0h8"/></svg></button></div>
      <p class="voice-status" id="voiceSearchStatus" role="status" aria-live="polite">Tap the microphone to search by speaking, or use keyboard dictation.</p>
-    <div class="catalog-filters" role="group" aria-label="Muscle group">${['All','Legs','Chest','Back','Shoulders','Arms','Core'].map(s=>`<button data-catalog-filter="${esc(s)}" class="chip ${catalogFilter===s?'selected':''}">${esc(s)}</button>`).join('')}</div>
+    <div class="catalog-filters" role="group" aria-label="Muscle group">${['All','Legs','Chest','Back','Shoulders','Arms','Core','Other'].map(s=>`<button data-catalog-filter="${esc(s)}" class="chip ${catalogFilter===s?'selected':''}">${esc(s)}</button>`).join('')}</div>
+    <div class="equipment-filter"><label for="catalogEquipment">Equipment</label><select id="catalogEquipment">${['All','Machine','Cable','Dumbbell','Barbell','Bodyweight','Band','Kettlebell','Other'].map(s=>`<option value="${s}" ${catalogEquipment===s?'selected':''}>${s==='All'?'All equipment':s}</option>`).join('')}</select><small>Exercise images may require internet the first time.</small></div>
     <div id="catalogResults">${catalogCards()}</div>`;
   };
   function shownPoints(id){let rs=entriesFor(id).filter(r=>Number.isFinite(Number(r.weight))&&Number(r.weight)>0);
@@ -301,9 +308,10 @@
     r.onresult=event=>{
       const raw=event.results?.[0]?.[0]?.transcript||'';
       const spoken=cleanVoiceText(raw);
-      catalogFilter='All';catalogSearch=spoken;
+      catalogFilter='All';catalogEquipment='All';catalogShown=24;catalogSearch=spoken;
       field.value=spoken;
       app.querySelectorAll('[data-catalog-filter]').forEach(b=>b.classList.toggle('selected',b.dataset.catalogFilter==='All'));
+      const equipment=$('#catalogEquipment');if(equipment)equipment.value='All';
       $('#catalogResults').innerHTML=catalogCards();
       voiceStatus(spoken?`Heard: “${raw}” — ${catalogMatches().length} matching exercises.`:'No words detected. Try again or type a search.');
     };
@@ -318,7 +326,8 @@
   }
   app.addEventListener('click',e=>{
     if(e.target.closest('#voiceExerciseSearch')){e.stopImmediatePropagation();startVoiceSearch();return;}
-    const f=e.target.closest('[data-catalog-filter]');if(f){e.stopImmediatePropagation();catalogFilter=f.dataset.catalogFilter;app.querySelectorAll('[data-catalog-filter]').forEach(x=>x.classList.toggle('selected',x.dataset.catalogFilter===catalogFilter));$('#catalogResults').innerHTML=catalogCards();return;}
+    if(e.target.closest('[data-catalog-more]')){e.stopImmediatePropagation();catalogShown+=24;$('#catalogResults').innerHTML=catalogCards();return;}
+    const f=e.target.closest('[data-catalog-filter]');if(f){e.stopImmediatePropagation();catalogShown=24;catalogFilter=f.dataset.catalogFilter;app.querySelectorAll('[data-catalog-filter]').forEach(x=>x.classList.toggle('selected',x.dataset.catalogFilter===catalogFilter));$('#catalogResults').innerHTML=catalogCards();return;}
     const info=e.target.closest('[data-exercise-info]');if(info){e.stopImmediatePropagation();openCatalogInfo(info.dataset.exerciseInfo);return;}
     const pick=e.target.closest('[data-pick-catalog]');if(pick){e.stopImmediatePropagation();pickCatalog(pick.dataset.pickCatalog);return;}
     const met=e.target.closest('[data-chart-metric]');if(met){e.stopImmediatePropagation();chartMetric=met.dataset.chartMetric;render();return;}
@@ -328,8 +337,8 @@
     const del=e.target.closest('[data-remove-cardio]');if(del){e.stopImmediatePropagation();const rec=data.cardio.find(r=>r.id===del.dataset.removeCardio);if(rec&&confirm(`Delete ${rec.duration} min ${rec.type} on ${rec.date}?`)){data.cardio=data.cardio.filter(r=>r.id!==rec.id);save();render();notify('Cardio session removed')}return;}
     if(e.target.closest('[data-send-share]')){e.stopImmediatePropagation();const str=shareText();if(!Object.values(data.sharePrefs).some(Boolean))return;const send=async()=>{try{if(navigator.share)await navigator.share({text:str,title:'Lift Log progress'});else if(navigator.clipboard){await navigator.clipboard.writeText(str);notify('Summary copied — share it with a friend')}else{openModal(`${modalTop('Copy your summary','Nothing is sent automatically')}<textarea class="share-copy" readonly>${esc(str)}</textarea>`);}}catch(err){if(err.name!=='AbortError')notify('Sharing unavailable. Please copy the summary manually.')}};void send();return;}
   },true);
-  app.addEventListener('input',e=>{if(e.target.id==='catalogSearch'){catalogSearch=e.target.value;$('#catalogResults').innerHTML=catalogCards()}},true);
-  app.addEventListener('change',e=>{const p=e.target.closest('[data-share-pref]');if(p){data.sharePrefs[p.dataset.sharePref]=p.checked;save();render()}},true);
+  app.addEventListener('input',e=>{if(e.target.id==='catalogSearch'){catalogShown=24;catalogSearch=e.target.value;$('#catalogResults').innerHTML=catalogCards()}},true);
+  app.addEventListener('change',e=>{if(e.target.id==='catalogEquipment'){catalogShown=24;catalogEquipment=e.target.value;$('#catalogResults').innerHTML=catalogCards();return;}const p=e.target.closest('[data-share-pref]');if(p){data.sharePrefs[p.dataset.sharePref]=p.checked;save();render()}},true);
   modalRoot.addEventListener('click',e=>{const pick=e.target.closest('[data-pick-catalog]');if(pick){e.stopImmediatePropagation();pickCatalog(pick.dataset.pickCatalog)}},true);
   const header=document.querySelector('.topbar');const settingsButton=document.createElement('button');settingsButton.className='settings-access';settingsButton.title='Settings & backups';settingsButton.setAttribute('aria-label','Settings & backups');settingsButton.innerHTML='⚙';header.append(settingsButton);settingsButton.addEventListener('click',()=>{tab='settings';render();window.scrollTo(0,0)});
   render();
