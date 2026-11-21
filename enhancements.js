@@ -197,9 +197,9 @@
   }
   function catalogCards(){const matches=catalogMatches(),display=matches.slice(0,catalogShown);return `<div class="catalog-results">${matches.length} exercise${matches.length===1?'':'s'} found · showing ${display.length}</div>${matches.length?`<div class="catalog-grid">${display.map(catalogCard).join('')}</div>${matches.length>display.length?`<button class="secondary catalog-more" type="button" data-catalog-more>Show more exercises (${matches.length-display.length} remaining)</button>`:''}`:'<p class="muted-inset">No matches yet. Try a shorter name (e.g. “calves”), a muscle group, or another equipment type.</p>'}`;}
   exercises=function(){return `<div class="page-top"><span class="eyebrow">YOUR WORKOUTS</span><h1>Find your movement.</h1><p class="sub">Search by name, equipment or muscle group. Tap an illustration to identify the exercise.</p></div>
-    <div class="section-header"><h2>My exercises <span class="count-inline">${data.exercises.length}</span></h2><button id="addExercise" class="text-action">+ Custom</button></div>
+    <div class="section-header"><h2>My saved exercises <span class="count-inline">${data.exercises.length}</span></h2><button id="addExercise" class="text-action">+ Custom</button></div>
     <div class="panel list-panel">${data.exercises.map(row).join('')||'<p class="muted-inset">Nothing tracked yet.</p>'}</div>
-    <div class="section-header"><h2>Browse ${CATALOG.length} exercises</h2><span class="hint">Start / finish references</span></div>
+    <div class="section-header"><h2>Browse ${CATALOG.length} available exercises</h2><span class="hint">Start / finish references</span></div>
      <div class="search-wrap" role="search"><label class="search-label" for="catalogSearch">Search exercises</label><span aria-hidden="true">⌕</span><input id="catalogSearch" type="search" placeholder="Name, machine or muscle..." value="${esc(catalogSearch)}" autocomplete="off"/><button type="button" id="voiceExerciseSearch" class="voice-search-button" aria-label="Search exercises using your voice" aria-pressed="false" title="Speak an exercise name"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5m-4 0h8"/></svg></button></div>
      <p class="voice-status" id="voiceSearchStatus" role="status" aria-live="polite">Tap the microphone to search by speaking, or use keyboard dictation.</p>
     <div class="catalog-filters" role="group" aria-label="Muscle group">${['All','Legs','Chest','Back','Shoulders','Arms','Core','Other'].map(s=>`<button data-catalog-filter="${esc(s)}" class="chip ${catalogFilter===s?'selected':''}">${esc(s)}</button>`).join('')}</div>
@@ -271,7 +271,7 @@
     <div class="panel info-panel"><strong>Privacy by design</strong><p>No public profiles, friend lists, social accounts or automatic data sharing exist in this version. Never place user health information in the GitHub repository.</p></div>`;
   }
   const baseSettings=settings;
-  settings=function(){return `${baseSettings()}<div class="panel info-panel"><strong>Social & device roadmap</strong><p>Manual cardio and opt-in summary sharing work locally. Live friend groups and wearable syncing need secure infrastructure and permission-based integrations.</p><button class="secondary" data-tab="groups">Friends & privacy</button></div>`};
+  settings=function(){return `${baseSettings()}<div class="panel info-panel"><strong>App v0.5.2 · ${CATALOG.length} available exercises</strong><p>The number beside "My saved exercises" is only the workouts you have personally added. The searchable library below is much larger.</p><button class="secondary" data-update-app type="button">Check for app updates</button></div><div class="panel info-panel"><strong>Social & device roadmap</strong><p>Manual cardio and opt-in summary sharing work locally. Live friend groups and wearable syncing need secure infrastructure and permission-based integrations.</p><button class="secondary" data-tab="groups">Friends & privacy</button></div>`};
   render=function(){mark();const pages={home,exercises,history,coach,settings,cardio:cardioPage,groups:groupPage};app.innerHTML=(pages[tab]||home)();document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));};
   function openCatalogInfo(id){
     const c=CATALOG.find(x=>x.id===id);if(!c)return;
@@ -338,6 +338,12 @@
     try{r.start();}catch(_){voiceActive=false;recognition=null;field.focus();voiceStatus('Could not start speech recognition. Use the iPhone keyboard microphone instead.');}
   }
   app.addEventListener('click',e=>{
+    if(e.target.closest('[data-update-app]')){
+      e.stopImmediatePropagation();
+      if(!navigator.onLine){notify('Connect to the internet to check for updates.');return;}
+      const update=async()=>{try{const reg=await navigator.serviceWorker?.getRegistration();if(reg)await reg.update()}catch(_){/* Reload will still request fresh versioned files. */}window.location.assign('./?refresh='+Date.now())};
+      void update();return;
+    }
     if(e.target.closest('#voiceExerciseSearch')){e.stopImmediatePropagation();startVoiceSearch();return;}
     if(e.target.closest('[data-catalog-more]')){e.stopImmediatePropagation();catalogShown+=24;$('#catalogResults').innerHTML=catalogCards();return;}
     const f=e.target.closest('[data-catalog-filter]');if(f){e.stopImmediatePropagation();catalogShown=24;catalogFilter=f.dataset.catalogFilter;app.querySelectorAll('[data-catalog-filter]').forEach(x=>x.classList.toggle('selected',x.dataset.catalogFilter===catalogFilter));$('#catalogResults').innerHTML=catalogCards();return;}
