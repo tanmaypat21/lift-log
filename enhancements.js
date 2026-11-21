@@ -5,10 +5,10 @@
   const CATALOG = [
     ['leg-press','Leg Press','Legs','Leg press machine','presslegs','Push the platform away with control.','plates'],
     ['calf-raises','Calf Raises','Legs','Calf raise machine','calf','Rise onto the balls of your feet.','plates'],
-    ['leg-curl','Hamstring Leg Curl','Legs','Leg curl machine (variation unspecified)','seatedcurl','Curl your lower legs against resistance. Select seated or lying if known.','direct'],
+    ['leg-curl','Hamstring Leg Curl','Legs','Leg curl machine (variation unspecified)','seatedcurl','HAMSTRINGS: bend knees and pull the pad backward/down. Select seated or lying.','direct'],
     ['seated-leg-curl','Seated Leg Curl','Legs','Seated curl machine','seatedcurl','Curl your lower legs against the pads.','direct'],
     ['lying-leg-curl','Lying Leg Curl','Legs','Lying curl machine','lyingcurl','Bend the knees while keeping hips stable.','direct'],
-    ['leg-extension','Leg Extension','Legs','Leg extension machine','seatedcurl','Straighten your knees smoothly.','direct'],
+    ['leg-extension','Leg Extension','Legs','Leg extension machine','seatedcurl','QUADS: straighten knees and push the shin pad up (opposite of hamstring curl).','direct'],
     ['squat','Barbell Squat','Legs','Barbell + rack','squat','Squat to a controlled depth.','direct'],
     ['rdl','Romanian Deadlift','Legs','Barbell or dumbbells','hinge','Hinge through the hips; keep load close.','direct'],
     ['lunge','Walking Lunge','Legs','Dumbbells or bodyweight','lunge','Take a step and lower under control.','direct'],
@@ -143,7 +143,7 @@
     curl:{head:[75,24],body:'M75 35L77 65L67 96 M77 65L89 96 M75 43L58 59L68 44 M77 43L96 60L86 44',gear:'<path d="M60 40h31M61 36v9M90 36v9"/>'}
   };
   const cateColor={Legs:'#9cf4af',Chest:'#b4c2ff',Back:'#8cd7f5',Shoulders:'#f3c79a',Arms:'#d7b7fb',Core:'#ebc7f0'};
-  let catalogFilter='All',catalogSearch='',chartRange='all',chartMetric='load';
+  let catalogFilter='All',catalogSearch='',catalogVisible=24,chartRange='all',chartMetric='load';
   const htmlNum=n => fmt(Number(n)||0);
   const $ = (s,root=document) => root.querySelector(s);
   function mark(){if(!Array.isArray(data.cardio))data.cardio=[];if(!data.sharePrefs||typeof data.sharePrefs!=='object')data.sharePrefs={workouts:false,cardio:false,records:false}; if(typeof data.cardioGoal!=='number')data.cardioGoal=0;}
@@ -155,7 +155,8 @@
     return `./assets/exercises/${id}/${frame}.webp`;
   }
   function figure(ex,large=false){
-    const id=MEDIA[ex.id];
+    const matching=CATALOG.find(c=>normalizeSearch(c.name)===normalizeSearch(ex.name));
+    const id=MEDIA[ex.catalogId||ex.id]||(matching&&MEDIA[matching.id]);
     if(!id){return `<div class="exercise-visual visual-fallback" role="img" aria-label="No reference image for ${esc(ex.name)}"><span aria-hidden="true">${esc(categoryIcon(ex.category))}</span><small>Custom exercise</small></div>`;}
     if(ex.id==='calf-raises'){
       const parts=[['standing-calf-raise-machine','Standing'],['seated-calf-raise-machine','Seated'],['leg-press-calf-raise','Leg press']];
@@ -199,7 +200,7 @@
       ${latest.length?`<div class="section-header"><h2>Recent lifts</h2><button class="text-action" data-tab="history">History →</button></div><div class="panel recent-panel">${latest.map(historyRow).join('')}</div>`:''}`;
   };
   function catalogCard(c){
-    const own=data.exercises.find(e=>e.catalogId===c.id||e.id===c.id);
+    const own=data.exercises.find(e=>e.catalogId===c.id||e.id===c.id||normalizeSearch(e.name)===normalizeSearch(c.name));
     const ambiguous=c.id==='calf-raises'||c.id==='leg-curl';
     const label=ambiguous?'Choose type':own?'Log':'Add +';
     const action=ambiguous?`data-exercise-info="${esc(c.id)}"`:`data-pick-catalog="${esc(c.id)}"`;
@@ -227,7 +228,12 @@
       .filter(x=>x.score>0)
       .sort((a,b)=>b.score-a.score||a.i-b.i).map(x=>x.c);
   }
-  function catalogCards(){const matches=catalogMatches();return `<div class="catalog-results">${matches.length} exercise${matches.length===1?'':'s'} found</div>${matches.length?`<div class="catalog-grid">${matches.map(catalogCard).join('')}</div>`:'<p class="muted-inset">No matches yet. Try a shorter name (e.g. “calves”), or describe the machine.</p>'}`;}
+  function catalogCards(){
+    const matches=catalogMatches(),visible=matches.slice(0,catalogVisible);
+    const cards=visible.length?'<div class="catalog-grid">'+visible.map(catalogCard).join('')+'</div>':'<p class="muted-inset">No matches. Try a shorter name or equipment description.</p>';
+    const more=matches.length>catalogVisible?'<button type="button" data-more-catalog class="secondary full catalog-load-more">Show more exercises ('+(matches.length-catalogVisible)+' remaining)</button>':'';
+    return '<div class="catalog-results">'+matches.length+(matches.length===1?' exercise':' exercises')+' found</div>'+cards+more;
+  }
   exercises=function(){return `<div class="page-top"><span class="eyebrow">YOUR WORKOUTS</span><h1>Find your movement.</h1><p class="sub">Search by name, equipment or muscle group. Tap an illustration to identify the exercise.</p></div>
     <div class="section-header"><h2>My exercises <span class="count-inline">${data.exercises.length}</span></h2><button id="addExercise" class="text-action">+ Custom</button></div>
     <div class="panel list-panel">${data.exercises.map(row).join('')||'<p class="muted-inset">Nothing tracked yet.</p>'}</div>
@@ -317,9 +323,9 @@
       }).join('')}</div><button class="secondary full" data-pick-catalog="${esc(c.id)}">Keep as ${esc(c.name)} (unspecified)</button>`);
       return;
     }
-    openModal(`${modalTop(c.name,c.category+' · '+c.equipment)}<div class="detail-figure">${figure(c,true)}</div><p class="detail-cue"><strong>How to recognize it:</strong> ${esc(c.cue)}</p><p class="smallprint">Images are visual identification aids, not professional form instructions. Machine designs vary.</p><button class="primary full" data-pick-catalog="${esc(c.id)}">${data.exercises.some(e=>e.catalogId===c.id||e.id===c.id)?'Log this exercise':'Add to my exercises'}</button>`);
+    openModal(`${modalTop(c.name,c.category+' · '+c.equipment)}<div class="detail-figure">${figure(c,true)}</div><p class="detail-cue"><strong>How to recognize it:</strong> ${esc(c.cue)}</p><p class="smallprint">Images are visual identification aids, not professional form instructions. Machine designs vary.</p><button class="primary full" data-pick-catalog="${esc(c.id)}">${data.exercises.some(e=>e.catalogId===c.id||e.id===c.id||normalizeSearch(e.name)===normalizeSearch(c.name))?'Log this exercise':'Add to my exercises'}</button>`);
   }
-  function pickCatalog(id){const c=CATALOG.find(x=>x.id===id);if(!c)return;const existing=data.exercises.find(x=>x.catalogId===c.id||x.id===c.id);
+  function pickCatalog(id){const c=CATALOG.find(x=>x.id===id);if(!c)return;const existing=data.exercises.find(x=>x.catalogId===c.id||x.id===c.id||normalizeSearch(x.name)===normalizeSearch(c.name));
     if(existing){if(modalRoot.innerHTML)closeModal();openLog(existing.id);return;}
     const ex={id:c.id,name:c.name,category:c.category,loadType:c.loadType,perSide:false,plates:{},directWeight:0,notes:`${c.equipment}. ${c.cue}`,catalogId:c.id};
     data.exercises.push(ex);if(save()){if(modalRoot.innerHTML)closeModal();render();notify('Exercise added — set your working weight');openExercise(ex.id)}
@@ -352,7 +358,7 @@
     r.onresult=event=>{
       const raw=event.results?.[0]?.[0]?.transcript||'';
       const spoken=cleanVoiceText(raw);
-      catalogFilter='All';catalogSearch=spoken;
+      catalogVisible=24;catalogFilter='All';catalogSearch=spoken;
       field.value=spoken;
       app.querySelectorAll('[data-catalog-filter]').forEach(b=>b.classList.toggle('selected',b.dataset.catalogFilter==='All'));
       $('#catalogResults').innerHTML=catalogCards();
@@ -369,7 +375,8 @@
   }
   app.addEventListener('click',e=>{
     if(e.target.closest('#voiceExerciseSearch')){e.stopImmediatePropagation();startVoiceSearch();return;}
-    const f=e.target.closest('[data-catalog-filter]');if(f){e.stopImmediatePropagation();catalogFilter=f.dataset.catalogFilter;app.querySelectorAll('[data-catalog-filter]').forEach(x=>x.classList.toggle('selected',x.dataset.catalogFilter===catalogFilter));$('#catalogResults').innerHTML=catalogCards();return;}
+    if(e.target.closest('[data-more-catalog]')){e.stopImmediatePropagation();catalogVisible+=24;$('#catalogResults').innerHTML=catalogCards();return;}
+    const f=e.target.closest('[data-catalog-filter]');if(f){e.stopImmediatePropagation();catalogVisible=24;catalogFilter=f.dataset.catalogFilter;app.querySelectorAll('[data-catalog-filter]').forEach(x=>x.classList.toggle('selected',x.dataset.catalogFilter===catalogFilter));$('#catalogResults').innerHTML=catalogCards();return;}
     const info=e.target.closest('[data-exercise-info]');if(info){e.stopImmediatePropagation();openCatalogInfo(info.dataset.exerciseInfo);return;}
     const pick=e.target.closest('[data-pick-catalog]');if(pick){e.stopImmediatePropagation();pickCatalog(pick.dataset.pickCatalog);return;}
     const met=e.target.closest('[data-chart-metric]');if(met){e.stopImmediatePropagation();chartMetric=met.dataset.chartMetric;render();return;}
@@ -379,7 +386,7 @@
     const del=e.target.closest('[data-remove-cardio]');if(del){e.stopImmediatePropagation();const rec=data.cardio.find(r=>r.id===del.dataset.removeCardio);if(rec&&confirm(`Delete ${rec.duration} min ${rec.type} on ${rec.date}?`)){data.cardio=data.cardio.filter(r=>r.id!==rec.id);save();render();notify('Cardio session removed')}return;}
     if(e.target.closest('[data-send-share]')){e.stopImmediatePropagation();const str=shareText();if(!Object.values(data.sharePrefs).some(Boolean))return;const send=async()=>{try{if(navigator.share)await navigator.share({text:str,title:'Lift Log progress'});else if(navigator.clipboard){await navigator.clipboard.writeText(str);notify('Summary copied — share it with a friend')}else{openModal(`${modalTop('Copy your summary','Nothing is sent automatically')}<textarea class="share-copy" readonly>${esc(str)}</textarea>`);}}catch(err){if(err.name!=='AbortError')notify('Sharing unavailable. Please copy the summary manually.')}};void send();return;}
   },true);
-  app.addEventListener('input',e=>{if(e.target.id==='catalogSearch'){catalogSearch=e.target.value;$('#catalogResults').innerHTML=catalogCards()}},true);
+  app.addEventListener('input',e=>{if(e.target.id==='catalogSearch'){catalogVisible=24;catalogSearch=e.target.value;$('#catalogResults').innerHTML=catalogCards()}},true);
   app.addEventListener('change',e=>{const p=e.target.closest('[data-share-pref]');if(p){data.sharePrefs[p.dataset.sharePref]=p.checked;save();render()}},true);
   modalRoot.addEventListener('click',e=>{const pick=e.target.closest('[data-pick-catalog]');if(pick){e.stopImmediatePropagation();pickCatalog(pick.dataset.pickCatalog)}},true);
   const header=document.querySelector('.topbar');const settingsButton=document.createElement('button');settingsButton.className='settings-access';settingsButton.title='Settings & backups';settingsButton.setAttribute('aria-label','Settings & backups');settingsButton.innerHTML='⚙';header.append(settingsButton);settingsButton.addEventListener('click',()=>{tab='settings';render();window.scrollTo(0,0)});
