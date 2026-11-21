@@ -1,3 +1,14 @@
+# Lift Log v0.5.1 — Wide-grip pulldown and curl discovery
+
+- Keeps the **v0.5 expanded library (340+ exercises)** and adds **Wide-Grip Lat Pulldown** as its own trackable movement, separate from close-grip and underhand pulldowns.
+- Voice and text search now recognize natural phrases such as **"wide grip pull downs," "preacher curls," "incline curls,"** and **"hammer curls."**
+- Already-saved custom exercises that have the same name as a catalog entry (for example, Preacher Curl) are identified as already tracked. Their previous entries and working weights are not overwritten or renamed.
+- Adds brief context explaining grip and arm-angle differences without claiming that an exercise completely isolates one biceps head.
+- Wide-grip pulldown uses the already bundled, local wide-bar lat-pulldown illustration for offline compatibility.
+- No changes to workout storage, existing entry IDs, personal profiles, AI coaching, or cloud syncing. The PWA cache version is updated for new code.
+
+---
+
 # Lift Log v0.5 — Expanded exercise catalog (beta)
 
 - The exercise picker now combines the previous 28 core movements with a large CC0 reference dataset: **340 strength/resistance records**, deduplicated by exercise ID, for **more than 340 distinct options** overall.
