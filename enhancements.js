@@ -46,6 +46,22 @@
     ["reverse-grip-barbell-row","Underhand Barbell Row","Back","Barbell · underhand grip","row","Row a barbell with palms facing upward.","direct"],
     ["wide-grip-pull-up","Wide-Grip Pull-Up","Back","Wide pull-up bar","pullup","Pull up with overhand hands wider than shoulders.","direct"],
     ["neutral-grip-pull-up","Neutral-Grip Pull-Up","Back","Parallel-grip pull-up handles","pullup","Pull upward with palms facing each other.","direct"]
+,
+    ["preacher-curl","Preacher Curl","Arms","Preacher bench · EZ bar/barbell","curl","Brace upper arms on angled pad in front of torso; curl bar.","direct"],
+    ["machine-preacher-curl","Machine Preacher Curl","Arms","Preacher curl machine","curl","Upper arms rest on front pad as you curl machine handles.","direct"],
+    ["dumbbell-preacher-curl","Dumbbell Preacher Curl","Arms","Preacher bench · dumbbell","curl","Brace one upper arm on pad and curl a dumbbell.","direct"],
+    ["incline-dumbbell-curl","Incline Dumbbell Curl","Arms","Incline bench · dumbbells","curl","Sit back with arms slightly behind torso, then curl.","direct"],
+    ["hammer-curl","Hammer Curl","Arms","Dumbbells · palms-in grip","curl","Curl with thumbs up and palms facing inward.","direct"],
+    ["cross-body-hammer-curl","Cross-Body Hammer Curl","Arms","Dumbbells · palms-in grip","curl","Curl dumbbell diagonally toward opposite shoulder.","direct"],
+    ["rope-hammer-curl","Cable Rope Hammer Curl","Arms","Low cable · rope attachment","curl","Curl rope upward with thumbs facing up.","direct"],
+    ["cable-curl","Cable Biceps Curl","Arms","Cable station · bar/handle","curl","Curl against cable resistance with steady upper arms.","direct"],
+    ["single-arm-cable-curl","Single-Arm Cable Curl","Arms","Cable station · single handle","curl","Curl one arm against low cable tension.","direct"],
+    ["concentration-curl","Concentration Curl","Arms","Dumbbell · seated","curl","Brace upper arm against inside thigh and curl.","direct"],
+    ["spider-curl","Spider Curl","Arms","Incline bench · dumbbells","curl","Chest rests on incline bench; arms hang forward as you curl.","direct"],
+    ["reverse-curl","Reverse Curl","Arms","Barbell/EZ bar · palms-down grip","curl","Curl with palms facing downward for forearm and elbow flexors.","direct"],
+    ["ez-bar-curl","EZ-Bar Biceps Curl","Arms","EZ curl bar","curl","Curl angled EZ bar with elbows near torso.","direct"],
+    ["alternating-dumbbell-curl","Alternating Dumbbell Curl","Arms","Dumbbells","curl","Curl one arm at a time, often rotating palm upward.","direct"],
+    ["barbell-curl","Barbell Biceps Curl","Arms","Straight barbell","curl","Curl bar upward with palms facing up and minimal swinging.","direct"]
   ].map(([id,name,category,equipment,pose,cue,loadType]) => ({id,name,category,equipment,pose,cue,loadType}));
   // Bundled CC0 reference images, from MarvinNazari/exercise-images.
   // Keep the same exercise IDs: users' existing logs must never be re-labelled automatically.
@@ -63,6 +79,7 @@
     'leg-press-calf-raise':'leg-press-calf-raise'
   };
   Object.assign(MEDIA, {"wide-grip-lat-pulldown":"lat-pulldown","close-grip-lat-pulldown":"close-grip-lat-pulldown","reverse-grip-lat-pulldown":"reverse-grip-lat-pulldown","straight-arm-pulldown":"straight-arm-pulldown","machine-high-row":"machine-high-row","machine-row":"machine-row","chest-supported-t-bar-row":"chest-supported-t-bar-row","chest-supported-dumbbell-row":"chest-supported-dumbbell-row","t-bar-row":"t-bar-row","single-arm-cable-row":"single-arm-cable-row","assisted-pull-up":"assisted-pull-up","reverse-grip-barbell-row":"reverse-grip-barbell-row","wide-grip-pull-up":"wide-grip-pull-up","neutral-grip-pull-up":"neutral-grip-pull-up"});
+  Object.assign(MEDIA, {"preacher-curl":"preacher-curl","machine-preacher-curl":"machine-preacher-curl","dumbbell-preacher-curl":"dumbbell-preacher-curl","incline-dumbbell-curl":"incline-dumbbell-curl","hammer-curl":"hammer-curls","cross-body-hammer-curl":"cross-body-hammer-curl","rope-hammer-curl":"rope-hammer-curl","cable-curl":"cable-curl","single-arm-cable-curl":"single-arm-cable-curl","concentration-curl":"concentration-curl","spider-curl":"spider-curl","reverse-curl":"reverse-curl","ez-bar-curl":"ez-bar-curl","alternating-dumbbell-curl":"alternating-dumbbell-curl","barbell-curl":"barbell-curl"});
   const ALIASES = {
     'calf-raises':['calves','calf machine','heel raises','toe raises','calf raises'],
     'standing-calf-raise':['standing calves','standing calf','calf raise machine','standing heel raise','calves machine','machine calves'],
