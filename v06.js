@@ -45,10 +45,10 @@
   }
   function trendRecords(exerciseId,metric=trendMetric,period=trendWindow){
     const start = period==='all' ? null : daysAgo(Math.max(0,Number(period)-1));
-    const matching=workoutEntries().filter(r=>r.exerciseId===exerciseId && (!start||r.date>=start) && Number(r.weight)>0);
+    const matching=workoutEntries().filter(r=>r.exerciseId===exerciseId && (!start||r.date>=start) && (metric==='reps'?Number(r.reps)>0:Number(r.weight)>0));
     const grouped = new Map();
     for(const entry of matching){
-      const value = metric==='volume'
+      const value = metric==='reps' ? (Number(entry.reps)>0?Number(entry.reps):null) : metric==='volume'
         ? (Number(entry.sets)>0&&Number(entry.reps)>0?Number(entry.weight)*Number(entry.sets)*Number(entry.reps):null)
         : Number(entry.weight);
       if(value===null||!Number.isFinite(value))continue;
@@ -82,7 +82,7 @@
     </svg></div>`;
   }
   function metricSelector(){
-    return `<div class="v6-segmented" role="group" aria-label="Progress measure"><button type="button" data-v6-metric="load" class="${trendMetric==='load'?'active':''}" aria-pressed="${trendMetric==='load'}">Best weight</button><button type="button" data-v6-metric="volume" class="${trendMetric==='volume'?'active':''}" aria-pressed="${trendMetric==='volume'}">Volume</button></div>`;
+    return `<div class="v6-segmented" role="group" aria-label="Progress measure"><button type="button" data-v6-metric="load" class="${trendMetric==='load'?'active':''}" aria-pressed="${trendMetric==='load'}">Best weight</button><button type="button" data-v6-metric="volume" class="${trendMetric==='volume'?'active':''}" aria-pressed="${trendMetric==='volume'}">Volume</button><button type="button" data-v6-metric="reps" class="${trendMetric==='reps'?'active':''}" aria-pressed="${trendMetric==='reps'}">Reps</button></div>`;
   }
   function chartCard(){
     const available=trendExercises();
@@ -94,7 +94,7 @@
     const points=trendRecords(selectedTrendExercise);
     const first=points[0]?.value,last=points.at(-1)?.value;
     const delta=points.length>1?last-first:null;
-    const goalLabel=trendMetric==='load'?'lb':'lb × reps';
+    const goalLabel=trendMetric==='load'?'lb':trendMetric==='reps'?'reps / set':'lb × reps';
     const difference=delta===null?'Add another training day':`${delta>0?'+':''}${formatNum(delta)} ${goalLabel} since first recorded day`;
     const prior=points.length>1&&first>0?` (${delta>0?'+':''}${Math.round(delta/first*100)}%)`:'';
     return `<section class="v6-surface v6-feature" aria-label="Your strength progress"><div class="v6-card-head"><div><span class="v6-eyebrow">ACTUAL WORKOUT DATA</span><h2>Strength trend</h2></div><span class="v6-hint">${points.length} recorded ${points.length===1?'day':'days'}</span></div>
@@ -144,7 +144,7 @@
     const sets=Number(record.sets),reps=Number(record.reps);
     const repText=sets>0&&reps>0?`${sets} sets × ${reps} reps`:'Sets / reps not recorded';
     const notes=String(record.notes||'');
-    return `<div class="v6-record"><div class="v6-record-icon" aria-hidden="true">↗</div><div class="v6-record-info"><strong>${escapeText(exerciseName(record.exerciseId))}</strong><span>${escapeText(repText)}${notes?` · ${escapeText(notes.slice(0,75))}`:''}</span></div><div class="v6-record-weight"><strong>${formatNum(record.weight)} lb</strong><button type="button" data-v6-edit-entry="${escapeText(record.id)}">Edit</button></div></div>`;
+    return `<div class="v6-record"><div class="v6-record-icon" aria-hidden="true">↗</div><div class="v6-record-info"><strong>${escapeText(exerciseName(record.exerciseId))}</strong><span>${escapeText(repText)}${notes?` · ${escapeText(notes.slice(0,75))}`:''}</span></div><div class="v6-record-weight"><strong>${record.exerciseId==='ab-coaster'&&Number(record.weight)===0?'Bodyweight':formatNum(record.weight)+' lb'}</strong><button type="button" data-v6-edit-entry="${escapeText(record.id)}">Edit</button></div></div>`;
   }
   function loggedCardio(record){
     const detail=[`${formatNum(record.duration)} min`,record.distance?`${formatNum(record.distance)} mi`:null,record.avgHr?`${formatNum(record.avgHr)} bpm`:null].filter(Boolean).join(' · ');
@@ -233,10 +233,10 @@
     const name=exerciseName(record.exerciseId);
     const exercise=exById(record.exerciseId);
     const plateLoad=exercise?.loadType==='plates'||Object.keys(record.plates||{}).length>0;
-    openModal(`${modalTop('Edit logged exercise',name)}<form id="v6EntryForm"><div class="v6-editor-intro">${escapeText(name)} · ${formatNum(record.weight)} lb</div>
+    openModal(`${modalTop('Edit logged exercise',name)}<form id="v6EntryForm"><div class="v6-editor-intro">${escapeText(name)} · ${record.exerciseId==='ab-coaster'&&Number(record.weight)===0?'Bodyweight':formatNum(record.weight)+' lb'}</div>
       <label class="v6-field">Workout date<input id="v6EntryDate" type="date" value="${escapeText(record.date)}" required /></label>
       <div class="v6-two-cols"><label class="v6-field">Sets<input id="v6EntrySets" type="number" min="1" max="100" value="${record.sets||''}" placeholder="3" /></label><label class="v6-field">Reps per set<input id="v6EntryReps" type="number" min="1" max="1000" value="${record.reps||''}" placeholder="10" /></label></div>
-      ${plateLoad?'<p class="v6-editor-tip">This record uses plate loading. Its weight is kept unchanged so the plate breakdown stays accurate.</p>':`<label class="v6-field">Working weight (lb)<input id="v6EntryWeight" type="number" step="0.5" min="0.5" max="100000" value="${Number(record.weight)||0}" required /></label>`}
+      ${plateLoad?'<p class="v6-editor-tip">This record uses plate loading. Its weight is kept unchanged so the plate breakdown stays accurate.</p>':`<label class="v6-field">Working weight (lb)<input id="v6EntryWeight" type="number" step="0.5" min="${record.exerciseId==='ab-coaster'?0:0.5}" max="100000" value="${Number(record.weight)||0}" required /></label>`}
       <label class="v6-field">Notes<textarea id="v6EntryNotes" maxlength="500" rows="3" placeholder="How did it feel?">${escapeText(record.notes||'')}</textarea></label><button type="submit" class="v6-button v6-full">Save workout changes</button><button type="button" class="v6-delete-entry" id="v6DeleteEntry">Delete this entry</button></form>`);
     modalRoot.querySelector('#v6DeleteEntry')?.addEventListener('click',()=>{
       if(!confirm(`Delete the ${record.date} ${name} workout entry? This cannot be undone.`))return;
@@ -253,7 +253,7 @@
       if(!isoDate(date)||!date)return alert('Choose a valid date.');
       if(Boolean(setValue)!==Boolean(repValue))return alert('Enter both sets and reps, or leave both blank.');
       if((setValue&&(!Number.isInteger(sets)||sets<1||sets>100))||(repValue&&(!Number.isInteger(reps)||reps<1||reps>1000)))return alert('Enter valid whole-number sets and reps.');
-      if(!Number.isFinite(Number(weight))||Number(weight)<=0||Number(weight)>100000)return alert('Enter a valid working weight.');
+      if(!Number.isFinite(Number(weight))||Number(weight)<0||(Number(weight)===0&&record.exerciseId!=='ab-coaster')||Number(weight)>100000)return alert('Enter a valid working weight.');
       Object.assign(record,{date,sets:setValue?sets:null,reps:repValue?reps:null,weight:Number(weight),notes:modalRoot.querySelector('#v6EntryNotes')?.value?.trim()||''});
       if(save()){expandedJournalDate=date;selectedJournalDate=date;closeModal();render();notify('Workout entry updated')}
     });
@@ -294,7 +294,7 @@
     if(target.hasAttribute('data-v6-edit-entry')){editEntry(target.dataset.v6EditEntry);return;}
   },true);
   app.addEventListener('change',event=>{
-    if(event.target.id==='v6TrendExercise'){selectedTrendExercise=event.target.value;render()}
+    if(event.target.id==='v6TrendExercise'){selectedTrendExercise=event.target.value;if(selectedTrendExercise==='ab-coaster'&&trendMetric==='load')trendMetric='reps';render()}
     if(event.target.id==='v6TrendRange'){trendWindow=event.target.value;render()}
     if(event.target.id==='v6JournalDate'){if(isoDate(event.target.value))selectedJournalDate=event.target.value;render()}
   },true);
