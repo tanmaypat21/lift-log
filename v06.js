@@ -14,7 +14,7 @@
   ];
   let selectedTrendExercise = null;
   let trendMetric = 'load';
-  let trendWindow = '90';
+  let trendWindow = 'all';
   let selectedJournalDate = today();
   let expandedJournalDate = null;
   let visibleJournalDays = 8;
@@ -252,7 +252,7 @@
     const browse=event.target.closest('[data-v6-browse-exercises]');
     if(!item&&!browse)return;
     event.preventDefault();event.stopImmediatePropagation();
-    if(item){pendingLogDate=modalRoot.querySelector('#v6PickerDate')?.value||today();const id=item.dataset.v6PickExercise;closeModal();openLog(id);return;}
+    if(item){pendingLogDate=modalRoot.querySelector('#v6PickerDate')?.value||today();if(isoDate(pendingLogDate)){selectedJournalDate=pendingLogDate;expandedJournalDate=pendingLogDate;}const id=item.dataset.v6PickExercise;closeModal();openLog(id);return;}
     const dt=modalRoot.querySelector('#v6PickerDate')?.value; if(isoDate(dt)){selectedJournalDate=dt;pendingLogDate=dt;}
     closeModal();tab='exercises';render();scrollTo({top:0,behavior:'instant'});
     document.querySelector('#catalogSearch')?.focus();
