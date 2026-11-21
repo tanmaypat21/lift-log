@@ -1,7 +1,7 @@
 // Lift Log v0.5.2: network-first app shell keeps installed PWAs up to date.
-const CACHE='lift-log-v6';
+const CACHE='lift-log-v6-1';
 const CORE=['./','./index.html','./styles.css','./v04.css','./v06.css','./app.js','./exercise-library.js','./enhancements.js','./v06.js','./icon.svg','./manifest.webmanifest'];
-const EXAMPLES=['./assets/exercises/standing-calf-raise-machine/start.webp','./assets/exercises/seated-calf-raise-machine/start.webp','./assets/exercises/leg-press-calf-raise/start.webp'];
+const EXAMPLES=['./assets/exercises/ab-coaster/start.svg','./assets/exercises/ab-coaster/end.svg','./assets/exercises/standing-calf-raise-machine/start.webp','./assets/exercises/seated-calf-raise-machine/start.webp','./assets/exercises/leg-press-calf-raise/start.webp'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll([...CORE,...EXAMPLES])));
   self.skipWaiting();
