@@ -306,15 +306,18 @@
   event.preventDefault();event.stopImmediatePropagation();
   const pickedDate=modalRoot.querySelector('#v6PickerDate')?.value;
   const date=isoDate(pickedDate)?pickedDate:today();
-  selectedJournalDate=date;expandedJournalDate=date;pendingLogDate=date;
+  selectedJournalDate=date;expandedJournalDate=date;
   closeModal();
   tab='history';
-  if(saved){openLog(saved.dataset.v6SavedPick);return;}
-  if(library){window.LiftLogCatalog?.pick(library.dataset.v6LibraryPick);return;}
+  render();
+  if(saved){pendingLogDate=date;openLog(saved.dataset.v6SavedPick);return;}
+  if(library){pendingLogDate=date;window.LiftLogCatalog?.pick(library.dataset.v6LibraryPick);return;}
+  // Only assign the pending date after custom exercise creation succeeds.
+  pendingLogDate=null;
   openExercise();
   const addedId=editorState?.id;
   modalRoot.querySelector('#exerciseForm')?.addEventListener('submit',()=>{
-    if(addedId && exById(addedId))queueMicrotask(()=>openLog(addedId));
+    if(addedId && exById(addedId))queueMicrotask(()=>{pendingLogDate=date;openLog(addedId);});
   });
 } ,true);
   render();
