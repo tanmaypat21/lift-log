@@ -1,3 +1,19 @@
+# Lift Log v0.5 — Expanded exercise catalog (beta)
+
+- The exercise picker now combines the previous 28 core movements with a large CC0 reference dataset: **340 strength/resistance records**, deduplicated by exercise ID, for **more than 340 distinct options** overall.
+- Exercise names, muscle groups, equipment, aliases and search metadata ship inside the app for **offline search**.
+- New images are fetched on demand from the public-domain [Open Exercise Illustrations](https://github.com/MarvinNazari/exercise-images) repository. They require an internet connection on first use; previously bundled reference images remain local.
+- Category and equipment filters, search ranking and batches of 24 cards keep the phone interface responsive.
+- More descriptive labels separate **quads (leg extensions)** from **hamstrings (leg curls)**. Images are identification references and are not medically or professionally vetted exercise instructions.
+- Saved exercises, weight entries, coach information and cardio data retain the previous `liftlog.v1` local-storage format. No existing entries are automatically renamed or modified.
+- The current build is still a static PWA; it has no cloud workout sync or live AI model.
+
+## Source / rights
+
+Open Exercise Illustrations (MarvinNazari) is published under CC0 1.0. The source states its illustrations are AI-generated and may contain equipment or form errors. Exercise recognition should rely on the exercise name, movement cues and equipment as well as the images.
+
+---
+
 # Lift Log v0.4.1 — Exercise identification & voice search
 
 - The gallery now uses **actual start/end movement reference images** rather than stick figures. Images are stored with the app, load offline after caching, and have short cues explaining the equipment and motion. On opening an exercise, Start and Finish pictures appear alongside identification text.

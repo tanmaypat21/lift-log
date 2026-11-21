@@ -1,5 +1,5 @@
-const CACHE='lift-log-v4-1';
-const CORE=['./','./index.html','./styles.css','./v04.css','./app.js','./enhancements.js','./icon.svg','./manifest.webmanifest'];
+const CACHE='lift-log-v5';
+const CORE=['./','./index.html','./styles.css','./v04.css','./app.js','./exercise-library.js','./enhancements.js','./icon.svg','./manifest.webmanifest'];
 const EXAMPLES=['./assets/exercises/standing-calf-raise-machine/start.webp','./assets/exercises/seated-calf-raise-machine/start.webp','./assets/exercises/leg-press-calf-raise/start.webp'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll([...CORE,...EXAMPLES])));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(names=>Promise.all(names.filter(n=>n.startsWith('lift-log-')&&n!==CACHE).map(n=>caches.delete(n)))));self.clients.claim()});
