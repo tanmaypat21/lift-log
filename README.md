@@ -1,3 +1,28 @@
+# Lift Log v0.6 — Progress first + dated workout journal
+
+## What changed
+- **Progress is now the opening screen.** Choose one recorded exercise, see its best load over time or its calculated training volume, and change the chart between 30 days, 90 days, or all time. Only saved workout entries are used; no invented trend points.
+- **Training fact immediately beneath the chart.** Tap refresh to read another short fitness note.
+- **Journal replaces the confusing old per-exercise History tab.** Every strength and cardio entry is grouped by recorded date, newest first. Expand a day to see its individual exercises, weights, sets, reps, notes, and cardio activities.
+- **Day-based logging.** Pick a workout date and a saved exercise, then log it into that day. The top-right **+ Log** shortcut is always available.
+- **Edit or delete an existing logged lift** from its day card. The editor allows changing its date, sets, reps and notes. Direct-weight entries may also change recorded weight; plate-loaded weights remain locked to their original plate breakdown.
+- **Simpler five-tab navigation:** Progress, Train, Journal, Cardio, Coach.
+- **Works with the previous exercise catalog and personal backups.** The data key remains `liftlog.v1`; no history is reset, rewritten or uploaded.
+
+## Accuracy and privacy
+- Charts use the **highest load recorded per exercise/date** or **total logged volume (weight × sets × reps) for that exercise/date**.
+- For volume charts, entries without sets or reps are excluded. Load comparisons are meaningful only on comparable machines/setup.
+- Daily cards use the date entered in each record. Some old seed entries have missing sets/reps and are shown as such.
+- Data remains local to the installed browser app. Export a JSON backup before changing devices, deleting browser data, or making a major upgrade.
+- Fitness notes are general education, not personalized medical advice. The AI Coach tab is still the previous rules-based prototype.
+
+## Tested
+- Headless Chromium UI interactions with sample workout records: trend chart, fact placement, date-grouped journal, collapse/expand, quick-log date, edit record, and validation.
+- Mobile widths 320, 375, 390 and 768 px showed no horizontal page overflow.
+- Full real-device testing on iOS and GitHub Pages deployment still needs user verification.
+
+---
+
 # Lift Log v0.5.1 — Wide-grip pulldown and curl discovery
 
 - Keeps the **v0.5 expanded library (340+ exercises)** and adds **Wide-Grip Lat Pulldown** as its own trackable movement, separate from close-grip and underhand pulldowns.
