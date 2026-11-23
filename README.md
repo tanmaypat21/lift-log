@@ -1,3 +1,36 @@
+# Lift Log v0.7 — Monochrome Progress + Complete History
+
+This release is a **view-only redesign** of the existing workout log. No recorded lifts, cardio entries, IDs, or user settings are migrated, deleted or overwritten.
+
+## New navigation and visual system
+
+- **Progress is now its own bottom tab**, and is the first screen shown when the app starts.
+- **Home** remains a compact overview with a recent-activity chart, a short training fact immediately below, last working weights, and a direct link to Progress.
+- The interface uses a high-contrast **black/white** palette, restrained dark surfaces, larger type and simpler controls. The installed app theme and icon also use monochrome.
+
+## Progress tab (graph first, then full log)
+
+1. **Training timeline:** bars show the number of saved strength/cardio entries on each of the last ten recorded training dates. Tap a date to see the recorded exercises, weights, reps and any cardio from that day. Activity counts are used rather than adding unrelated machine weights together.
+2. **Strength view:** select a particular exercise and chart recorded **weight**, **training volume** (weight × sets × reps) or **reps**, with 30-day, 90-day or all-time windows. Do not interpret machine loads across different equipment as directly comparable.
+3. **Complete history:** every workout is grouped **month → date → individual entries**. Search by exercise name, date or notes; filter by month; expand previous months. Undated records remain visible in an Undated workouts section.
+4. **Edit controls:** use the existing journal editor to correct the entry's date, reps, weight and notes where applicable.
+
+## Data safety remains in effect
+
+The previous v0.6.2 local recovery and merge-only JSON backup tools remain loaded. This design adds **no new storage keys** and does not modify the `liftlog.v1` record structure.
+
+**Important:** the app still saves locally on the device. Local recovery snapshots are not cloud backups; export regular JSON copies to Files or another secure location. Avoid deleting the app or clearing website data if you have not backed up.
+
+## Test notes
+
+- Verified JS parses and the new Home/Progress routes.
+- Verified month/date groups include old dates and invalid/undated logs.
+- Verified overview activity chart, exercise weight/volume chart and date-selection interactions with sample logs.
+- Verified Edit dispatches to the existing journal editor, and the view logic does not mutate workout data.
+- Requires final touch/appearance testing on iPhone after GitHub Pages deploys.
+
+---
+
 # Lift Log v0.6.2 — Safer workout history and recovery
 
 **Your data is important.** This release addresses two failure points: older exercises were difficult to find in the Journal, and startup could replace an unreadable local save with starter records.
