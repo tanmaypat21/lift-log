@@ -1,1 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="42" fill="#0d111a"/><rect x="24" y="24" width="144" height="144" rx="32" fill="#9ef5a8"/><path d="M55 129 132 52m-53 0h53v53" fill="none" stroke="#0e2114" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="Lift Log">
+<rect width="192" height="192" rx="38" fill="#050505"/>
+<rect x="22" y="22" width="148" height="148" rx="29" fill="#fff"/>
+<path d="M54 130 132 52m-51 0h51v51" fill="none" stroke="#080808" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
