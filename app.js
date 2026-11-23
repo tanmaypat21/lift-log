@@ -12,7 +12,29 @@ const initial={version:1,exercises:[
 ]};
 function copy(x){return JSON.parse(JSON.stringify(x))}
 function validState(x){return x&&x.version===1&&Array.isArray(x.exercises)&&Array.isArray(x.entries)&&x.exercises.length<5000&&x.entries.length<300000&&x.exercises.every(e=>typeof e.id==='string'&&typeof e.name==='string'&&e.name.length<=100&&['plates','direct'].includes(e.loadType))&&x.entries.every(e=>typeof e.exerciseId==='string'&&Number.isFinite(Number(e.weight))&&Number(e.weight)>=0&&Number(e.weight)<100000)}
-let data=(()=>{try{const saved=JSON.parse(localStorage.getItem(KEY));return validState(saved)?saved:copy(initial)}catch{return copy(initial)}})();
+let dataRecoveryBlocked=false;
+let data=(()=>{
+  let raw=null;
+  try{
+    raw=localStorage.getItem(KEY);
+    if(raw!==null){
+      const saved=JSON.parse(raw);
+      if(validState(saved))return saved;
+      dataRecoveryBlocked=true;
+    }
+  }catch(_){dataRecoveryBlocked=true}
+  // A valid independent local copy is safer than silently resetting to demo data.
+  try{
+    const previous=JSON.parse(localStorage.getItem(KEY+'.lastGood'));
+    if(validState(previous)){
+      if(dataRecoveryBlocked&&raw){try{localStorage.setItem(KEY+'.unreadable',raw)}catch(_){}}
+      dataRecoveryBlocked=false;
+      return previous;
+    }
+  }catch(_){}
+  // Protect unreadable user data: never overwrite it with starter entries.
+  return copy(initial);
+})();
 // Backward-compatible update for data created with the first prototype. Never re-seed if removed later.
 if(!data.migrations?.legCurl20261117){
   if(!data.exercises.some(e=>e.id==='leg-curl')){
@@ -26,7 +48,7 @@ if(!data.coach||typeof data.coach!=='object')data.coach=copy(blankCoach);
 if(!Array.isArray(data.checkins))data.checkins=[];
 if(!data.intake || typeof data.intake!=='object')data.intake={};
 if(!Array.isArray(data.weeklyReviews))data.weeklyReviews=[];
-try{localStorage.setItem(KEY,JSON.stringify(data))}catch{}
+// Do not write initial seed data at startup: recovery snapshots may contain missing logs.
 
 let tab='home',selectedExercise='leg-press',editorState=null,toastTimer=null,interviewStep=0;
 const app=document.querySelector('#app'),modalRoot=document.querySelector('#modalRoot');
@@ -34,7 +56,27 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'
 const fmt=n=>Number(n).toLocaleString('en-US',{maximumFractionDigits:2});
 function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function newId(){return typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID():`${Date.now()}-${Math.random().toString(36).slice(2)}`}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(data));return true}catch(e){alert('Could not save locally. Export a JSON backup. '+e.message);return false}}
+function save(){
+  if(dataRecoveryBlocked){
+    alert('Your existing workout data could not be read. Nothing has been overwritten. Use Settings → Recovery & backups before adding a workout.');
+    return false;
+  }
+  if(!validState(data)){alert('Workout data validation failed. No changes were written.');return false}
+  try{
+    const before=localStorage.getItem(KEY);
+    if(before && before!==JSON.stringify(data)){
+      try{const previous=JSON.parse(before);if(validState(previous))void window.LiftLogSafety?.capture(previous,'before change')}catch(_){}
+    }
+    const serialized=JSON.stringify(data);
+    localStorage.setItem(KEY,serialized);
+    localStorage.setItem(KEY+'.lastGood',serialized);
+    void window.LiftLogSafety?.capture(serialized,'saved workout data');
+    return true;
+  }catch(e){
+    alert('Could not save the workout on this device. Export a JSON backup and check available storage. '+e.message);
+    return false;
+  }
+}
 function notify(message){const el=document.querySelector('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2800)}
 function exById(id){return data.exercises.find(e=>e.id===id)}
 function entriesFor(id){return data.entries.filter(e=>e.exerciseId===id).sort((a,b)=>b.date.localeCompare(a.date))}
@@ -221,7 +263,30 @@ function openExercise(id){const orig=id?exById(id):null;editorState=orig?copy(or
 function downloadFile(filename,content,type){const blob=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),5000)}
 function csvRow(fields){return fields.map(x=>'"'+String(x??'').replace(/"/g,'""')+'"').join(',')}
 function exportCsv(){const hdr=['Date','Exercise','Muscle group','Weight (lb)','Sets','Reps','Per side','Plate breakdown','Notes'];const rs=data.entries.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(r=>{const e=exById(r.exerciseId);return [r.date,e?.name||'',e?.category||'',r.weight,r.sets||'',r.reps||'',r.perSide?'Yes':'No',describePlates(r.plates||{},r.perSide),r.notes||'']});downloadFile('lift-log-'+today()+'.csv',[hdr,...rs].map(csvRow).join('\r\n'),'text/csv;charset=utf-8');notify('CSV exported')}
-async function importData(file){if(!file||file.size>5e6)return alert('Choose a JSON backup under 5 MB.');try{const payload=JSON.parse(await file.text());if(!validState(payload))throw Error('Not a supported Lift Log backup.');if(!confirm(`Replace this device's current ${data.entries.length} entries with ${payload.entries.length} from the backup? Export first if needed.`))return;data=payload;if(!data.coach||typeof data.coach!=='object')data.coach=copy(blankCoach);if(!Array.isArray(data.checkins))data.checkins=[];if(!data.intake||typeof data.intake!=='object')data.intake={};if(!Array.isArray(data.weeklyReviews))data.weeklyReviews=[];selectedExercise=data.exercises[0]?.id||'';save();render();notify('Backup imported')}catch(e){alert('Import failed: '+e.message)}}
+async function importData(file){
+  if(!file||file.size>5e6)return alert('Choose a JSON backup under 5 MB.');
+  try{
+    const payload=JSON.parse(await file.text());
+    if(!validState(payload))throw Error('Not a supported Lift Log backup.');
+    const {data:merged,added}=window.LiftLogSafety.merge(data,payload);
+    const found=Object.entries(added).map(([k,v])=>k+': '+v).join(' · ');
+    if(!confirm('Merge this backup WITHOUT deleting your current records? New items: '+found))return;
+    if(dataRecoveryBlocked){dataRecoveryBlocked=false;}
+    data=merged;
+    if(save()){render();notify('Backup merged safely. Your recent entries are kept.')}
+  }catch(e){alert('Import failed. Existing data was not changed: '+e.message)}
+}
+window.LiftLogStorage={
+  snapshot:()=>copy(data),
+  isRecoveryBlocked:()=>dataRecoveryBlocked,
+  mergeRecovery:payload=>{
+    const {data:merged,added}=window.LiftLogSafety.merge(data,payload);
+    const old=data;data=merged;
+    const blocked=dataRecoveryBlocked;dataRecoveryBlocked=false;
+    if(!save()){data=old;dataRecoveryBlocked=blocked;return null}
+    render();return added;
+  }
+};
 app.addEventListener('submit',e=>{if(e.target.id==='coachForm'){e.preventDefault();saveCoach(false)}});
 app.addEventListener('click',e=>{if(e.target.closest('#addCheckin'))return saveCoach(true);if(e.target.closest('#openCoachInterview'))return openInterview();if(e.target.closest('#openWeeklyReview'))return openWeeklyReview();if(e.target.closest('#copyCoachBrief'))return copyCoachBrief();const log=e.target.closest('[data-log]'),edit=e.target.closest('[data-edit]'),tabBtn=e.target.closest('[data-tab]'),remove=e.target.closest('[data-remove-entry]');if(log)return openLog(log.dataset.log);if(edit)return openExercise(edit.dataset.edit);if(tabBtn){tab=tabBtn.dataset.tab;render();window.scrollTo(0,0);return}if(remove){const entry=data.entries.find(x=>x.id===remove.dataset.removeEntry);if(entry&&confirm(`Delete the ${entry.date} record of ${fmt(entry.weight)} lb?`)){data.entries=data.entries.filter(x=>x.id!==entry.id);save();render();notify('Entry deleted')}return}if(e.target.closest('#addExercise'))return openExercise();if(e.target.closest('#exportJson'))return downloadFile('lift-log-backup-'+today()+'.json',JSON.stringify(data,null,2),'application/json');if(e.target.closest('#exportCsv'))return exportCsv();if(e.target.closest('#importJson'))document.querySelector('#importFile')?.click()});
 app.addEventListener('change',e=>{if(e.target.id==='historyExercise'){selectedExercise=e.target.value;render()}if(e.target.id==='importFile')importData(e.target.files?.[0])});
