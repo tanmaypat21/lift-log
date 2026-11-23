@@ -415,5 +415,6 @@
     if(addedId && exById(addedId))queueMicrotask(()=>{pendingLogDate=date;openLog(addedId);});
   });
 } ,true);
+  window.LiftLogJournalEditor=Object.freeze({editEntry});
   render();
 })();
