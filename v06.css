@@ -161,3 +161,7 @@ body{background:radial-gradient(ellipse 100% 32% at 50% -16%,#1b4338 0,transpare
 .v62-snapshot button{font-size:11px;padding:10px}
 .v62-disclaimer{font-size:11px!important;color:#bfcbd3!important}
 @media(max-width:420px){.v62-weight-row>strong{font-size:13px}.v62-weight-row strong{font-size:12px}.v62-recovery-banner{gap:6px;padding:9px}.v62-snapshot button{padding:8px;font-size:10px}}
+
+.v62-last-load{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 14px;margin:14px 0 10px;border:1px solid #37604b;background:#152c25;border-radius:13px}
+.v62-last-load span{font-size:12px;color:#c9d6d1}
+.v62-last-load strong{font-size:19px;color:#a8f8b4;white-space:nowrap}
