@@ -300,8 +300,9 @@
       <label class="v6-field">Notes<textarea id="v6EntryNotes" maxlength="500" rows="3" placeholder="How did it feel?">${escapeText(record.notes||'')}</textarea></label><button type="submit" class="v6-button v6-full">Save workout changes</button><button type="button" class="v6-delete-entry" id="v6DeleteEntry">Delete this entry</button></form>`);
     modalRoot.querySelector('#v6DeleteEntry')?.addEventListener('click',()=>{
       if(!confirm(`Delete the ${record.date} ${name} workout entry? This cannot be undone.`))return;
+      window.LiftLogAuthorizedDeletion={type:'entries',id:record.id};
       data.entries=data.entries.filter(entry=>entry.id!==record.id);
-      if(save()){closeModal();render();notify('Workout entry deleted')}
+      if(save()){closeModal();render();notify('Workout entry deleted (recoverable from snapshots)')}
     });
     modalRoot.querySelector('#v6EntryForm')?.addEventListener('submit',event=>{
       event.preventDefault();
