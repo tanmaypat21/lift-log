@@ -39,7 +39,7 @@
     const byDate = date => {if(!bucket.has(date))bucket.set(date,{date,weights:[],cardio:[]});return bucket.get(date);};
     workoutEntries().forEach(record=>byDate(isoDate(record.date)?record.date:'undated').weights.push(record));
     cardioEntries().forEach(record=>byDate(record.date).cardio.push(record));
-    return [...bucket.values()].sort((a,b)=>b.date.localeCompare(a.date));
+    return [...bucket.values()].sort((a,b)=>a.date==='undated'?1:b.date==='undated'?-1:b.date.localeCompare(a.date));
   }
   function trendExercises(){
     const seen = new Set(workoutEntries().map(r=>r.exerciseId));
@@ -130,6 +130,7 @@
     return `<div class="v6-page"><div class="v6-heading"><span class="v6-eyebrow">LIFT LOG · YOUR PROGRESS</span><h1>See how far you've come<span class="v6-period">.</span></h1><p>Your strength, one workout at a time.</p></div>
       ${chartCard()}
       ${factCard()}
+      ${weightBoard(5)}
       <div class="v6-section-title"><h2>This week</h2><span>Last 7 days</span></div>
       <div class="v6-stat-grid"><div class="v6-stat"><strong>${totals.days}</strong><span>Active days</span></div><div class="v6-stat"><strong>${totals.lifts}</strong><span>Lift entries</span></div><div class="v6-stat"><strong>${formatNum(totals.minutes)}</strong><span>Cardio min</span></div></div>
       ${compactRecent()}
@@ -181,7 +182,7 @@
   }
   function weightBoard(limit=0){
     let rows=latestWeightRows();
-    const q=journalQuery.trim().toLowerCase();
+    const q=tab==='history'?journalQuery.trim().toLowerCase():'';
     if(q)rows=rows.filter(x=>x.ex.name.toLowerCase().includes(q));
     const visible=limit?rows.slice(0,limit):rows;
     return `<section class="v6-surface v62-weight-board">
@@ -209,7 +210,7 @@
   function journalPage(){
     const all=dailySessions(),sessions=filteredSessions();
     if(sessions.length&&!sessions.some(s=>s.date===expandedJournalDate))expandedJournalDate=sessions[0].date;
-    const shown=journalShowAll?sessions:sessions.slice(0,visibleJournalDays);
+    const shown=(journalShowAll||journalQuery.trim())?sessions:sessions.slice(0,visibleJournalDays);
     return `<div class="v6-page v6-journal">
       <div class="v6-heading"><span class="v6-eyebrow">TRAINING JOURNAL · FULL HISTORY</span>
         <h1>Find any previous workout<span class="v6-period">.</span></h1>
@@ -338,9 +339,11 @@
     }
   },true);
   app.addEventListener('click',event=>{
-    const target=event.target.closest('[data-v6-quick-log],[data-v6-open-journal],[data-v6-toggle-day],[data-v6-more-days],[data-v6-next-fact],[data-v6-open-day],[data-v6-show-exercise],[data-v6-metric],[data-v6-edit-entry]');
+    const target=event.target.closest('[data-v6-quick-log],[data-v6-open-journal],[data-v6-toggle-day],[data-v6-more-days],[data-v6-next-fact],[data-v6-open-day],[data-v6-show-exercise],[data-v6-metric],[data-v6-edit-entry],[data-v62-all-days],[data-v62-open-weights]');
     if(!target)return;
     event.preventDefault();event.stopImmediatePropagation();
+    if(target.hasAttribute('data-v62-all-days')){journalShowAll=true;render();return;}
+    if(target.hasAttribute('data-v62-open-weights')){tab='history';render();scrollTo({top:0,behavior:'instant'});return;}
     if(target.hasAttribute('data-v6-quick-log')){quickLog(target.dataset.v6QuickLog||(tab==='history'?selectedJournalDate:today()));return;}
     if(target.hasAttribute('data-v6-open-journal')){tab='history';render();scrollTo({top:0,behavior:'instant'});return;}
     if(target.hasAttribute('data-v6-toggle-day')){expandedJournalDate=expandedJournalDate===target.dataset.v6ToggleDay?'':target.dataset.v6ToggleDay;render();return;}
@@ -350,6 +353,17 @@
     if(target.hasAttribute('data-v6-show-exercise')){const day=workoutEntries().filter(r=>r.exerciseId===target.dataset.v6ShowExercise).map(r=>r.date).sort().at(-1);expandedJournalDate=day||null;if(day)selectedJournalDate=day;tab='history';render();scrollTo({top:0,behavior:'instant'});return;}
     if(target.hasAttribute('data-v6-metric')){trendMetric=target.dataset.v6Metric;render();return;}
     if(target.hasAttribute('data-v6-edit-entry')){editEntry(target.dataset.v6EditEntry);return;}
+  },true);
+  app.addEventListener('input',event=>{
+    if(event.target.id!=='v62JournalSearch')return;
+    const position=event.target.selectionStart;
+    journalQuery=event.target.value;
+    render();
+    const field=app.querySelector('#v62JournalSearch');
+    if(field){
+      field.focus();
+      if(typeof position==='number')try{field.setSelectionRange(position,position)}catch(_){}
+    }
   },true);
   app.addEventListener('change',event=>{
     if(event.target.id==='v6TrendExercise'){selectedTrendExercise=event.target.value;if(selectedTrendExercise==='ab-coaster'&&trendMetric==='load')trendMetric='reps';render()}
