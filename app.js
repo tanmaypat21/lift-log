@@ -69,7 +69,8 @@ function save(){
     }
     const serialized=JSON.stringify(data);
     localStorage.setItem(KEY,serialized);
-    localStorage.setItem(KEY+'.lastGood',serialized);
+    // A quota error in the *secondary* copy must not falsely report the primary save as failed.
+    try{localStorage.setItem(KEY+'.lastGood',serialized)}catch(_){}
     void window.LiftLogSafety?.capture(serialized,'saved workout data');
     return true;
   }catch(e){
