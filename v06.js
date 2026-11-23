@@ -162,8 +162,9 @@
     const byExercise=new Map();
     workoutEntries().forEach((entry,index)=>{
       const prior=byExercise.get(entry.exerciseId);
-      if(!prior||String(entry.date||'')>String(prior.entry.date||'')||
-        (String(entry.date||'')===String(prior.entry.date||'')&&index>prior.index)){
+      const date=isoDate(entry.date)?entry.date:'';
+      const previousDate=prior&&isoDate(prior.entry.date)?prior.entry.date:'';
+      if(!prior||date>previousDate||(date===previousDate&&index>prior.index)){
         byExercise.set(entry.exerciseId,{entry,index});
       }
     });
