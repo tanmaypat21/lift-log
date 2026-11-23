@@ -1,3 +1,34 @@
+# Lift Log v0.6.2 — Safer workout history and recovery
+
+**Your data is important.** This release addresses two failure points: older exercises were difficult to find in the Journal, and startup could replace an unreadable local save with starter records.
+
+## Find every logged weight
+
+- **Home → My last working weights:** recent loads or saved default loads directly underneath the progress chart and training fact.
+- **Journal → My last working weights:** all saved exercises, with the most recently dated entry and sets/reps when available. Saved starting loads are explicitly labeled when no dated entry exists.
+- **Journal → Search all workouts and weights:** search by exercise name, date, or notes. The entire history is searched, not just the first eight days.
+- **Journal → Every training day:** dated sessions remain grouped by date; tap **Show all training days** to expand the complete log. Records with invalid dates are shown in an **undated** group rather than silently hidden.
+- A user's latest weight for an exercise is selected by actual workout date and, for multiple entries that day, last-saved sequence.
+
+## Saving and recovery safeguards
+
+- **Never replace an unreadable primary save with seed data.** If recovery is needed, keep the unreadable source and disable writes until compatible data can be restored.
+- Stop automatically writing starter records every time the application opens.
+- After successful saves, write an additional best-effort last-known-good copy and a separate **IndexedDB** snapshot. Keep up to 65 snapshots to help recover accidental local changes.
+- **Settings → Recovery center:** inspect local snapshots, recover missing entries, export your full current log, or merge an older exported JSON file.
+- **Import is merge-only**: existing newer exercises and entries remain; older unique record IDs are added. Merging the same file twice does not duplicate entries.
+- **No migration** of `liftlog.v1` workout data, no changes to exercise IDs, and no deletion of previous entries during version upgrades.
+
+### Important limitation
+
+These protections are **local to one installed app/browser data container**. iOS can erase site data or separate the standalone Home Screen app's storage from Safari. Deleting/reinstalling the app, clearing website data, or running out of device storage can still erase both primary and recovery copies. **Export a complete JSON file regularly to Files/iCloud/another secure location.** True automatic cross-device, cloud-backed persistence will require authenticated accounts, a database and backups.
+
+### Recover November 19 data without losing newer workouts
+
+If you have `lift-log-backup-2026-11-19.json`, open **Settings → Recovery center → Merge previous JSON backup**. Confirm the added items; the merge should restore any missing November 19 records while retaining more recent items. The exported November 19 file has five saved exercises but only three dated workout entries. You cannot recreate workouts that were never written or backed up.
+
+---
+
 # Lift Log v0.6.1 — Search before logging + Ab Coaster
 
 ## New workout flow
