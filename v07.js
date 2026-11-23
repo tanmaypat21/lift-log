@@ -296,15 +296,8 @@
     }
     if(button.hasAttribute('data-v07-fact')){noteIndex=(noteIndex+1)%facts.length;repaint();return;}
     if(button.hasAttribute('data-v07-edit')){
-      // Existing v0.6.2 editor is scoped to its module; navigate to the dated Journal's
-      // native editor using its already-registered click handling.
       const id=button.dataset.v07Edit,row=rawLifts().find(r=>r.id===id);
-      if(!row)return;
-      const existing=document.querySelector('[data-v6-edit-entry="'+id+'"]');
-      if(existing)existing.click();
-      else{
-        alert('This entry can be reviewed here. Editing will be available after the next journal editor update.');
-      }
+      if(row)window.LiftLogJournalEditor?.editEntry(id);
     }
   },true);
   app.addEventListener('change',event=>{
