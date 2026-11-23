@@ -326,6 +326,27 @@
     pendingLogDate=null;
     standardLog(exerciseId);
     if(date&&isoDate(date)){const field=modalRoot.querySelector('#logDate');if(field)field.value=date;}
+    const form=modalRoot.querySelector('#logForm');
+    const exercise=exById(exerciseId),prior=recent(exerciseId);
+    if(form){
+      const priorLoad=prior?Number(prior.weight):Number(exerciseLoad(exercise));
+      const when=prior?'Previously logged '+readableDate(prior.date):'Saved starting load';
+      const details=prior&&prior.sets&&prior.reps?' · '+prior.sets+' × '+prior.reps:'';
+      form.insertAdjacentHTML('afterbegin',
+        `<div class="v62-last-load"><span>${escapeText(when)}${escapeText(details)}</span><strong>${exerciseId==='ab-coaster'&&priorLoad===0?'Bodyweight':formatNum(priorLoad)+' lb'}</strong></div>`);
+      // The original handler saves first. Move to the dated Journal only after a successful save.
+      form.addEventListener('submit',()=>{
+        const submittedDate=form.querySelector('#logDate')?.value;
+        queueMicrotask(()=>{
+          if(!modalRoot.innerHTML&&isoDate(submittedDate)){
+            selectedJournalDate=submittedDate;
+            expandedJournalDate=submittedDate;
+            tab='history';
+            render();
+          }
+        });
+      });
+    }
   };
 
   home=progressHome;
