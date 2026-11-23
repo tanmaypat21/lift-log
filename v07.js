@@ -92,7 +92,7 @@
   }
   function activityChart(dayList,compact=false){
     const chronological=dayList.filter(d=>d.date!=='undated').slice().reverse();
-    const display=chronological.slice(-14);
+    const display=chronological.slice(-10);
     if(!display.length)return `<div class="v7-chart-empty">Your training graph will start when you record a dated workout.</div>`;
     const values=display.map(d=>d.lifts.length+d.cardio.length);
     const max=Math.max(1,...values);
@@ -260,7 +260,7 @@
           <button type="button" data-v07-panel="activity" aria-pressed="${panel==='activity'}" class="${panel==='activity'?'active':''}">Workout days</button>
           <button type="button" data-v07-panel="strength" aria-pressed="${panel==='strength'}" class="${panel==='strength'?'active':''}">Strength</button>
         </div>
-        ${panel==='activity'?`<p class="v7-chart-desc">Number of recorded movements on each training day · latest 14 dates</p>
+        ${panel==='activity'?`<p class="v7-chart-desc">Number of recorded movements on each training day · latest 10 dates</p>
           ${activityChart(s.ds)}${daySummary(shown&&chosenDay?s.ds.find(d=>d.date===chosenDay)||shown:shown)}`:strengthChart()}
       </section>
       ${monthlyHistory()}
