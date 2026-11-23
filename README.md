@@ -5,6 +5,7 @@
 ## Find every logged weight
 
 - **Home → My last working weights:** recent loads or saved default loads directly underneath the progress chart and training fact.
+- **When logging a lift:** the log form shows the previous recorded load and its date/sets/reps, then takes you to that day's Journal after saving.
 - **Journal → My last working weights:** all saved exercises, with the most recently dated entry and sets/reps when available. Saved starting loads are explicitly labeled when no dated entry exists.
 - **Journal → Search all workouts and weights:** search by exercise name, date, or notes. The entire history is searched, not just the first eight days.
 - **Journal → Every training day:** dated sessions remain grouped by date; tap **Show all training days** to expand the complete log. Records with invalid dates are shown in an **undated** group rather than silently hidden.
@@ -14,6 +15,7 @@
 
 - **Never replace an unreadable primary save with seed data.** If recovery is needed, keep the unreadable source and disable writes until compatible data can be restored.
 - Stop automatically writing starter records every time the application opens.
+- On ordinary saves, compare existing record IDs and automatically retain any unexpectedly missing strength/cardio logs. Explicit deletions require confirmation and retain older recovery snapshots.
 - After successful saves, write an additional best-effort last-known-good copy and a separate **IndexedDB** snapshot. Keep up to 65 snapshots to help recover accidental local changes.
 - **Settings → Recovery center:** inspect local snapshots, recover missing entries, export your full current log, or merge an older exported JSON file.
 - **Import is merge-only**: existing newer exercises and entries remain; older unique record IDs are added. Merging the same file twice does not duplicate entries.
