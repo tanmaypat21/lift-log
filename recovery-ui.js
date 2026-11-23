@@ -85,7 +85,7 @@
     if(event.target.id!=='v62File')return;
     const file=event.target.files?.[0];
     if(!file)return;
-    void importData(file).then(()=>{if(!modalRoot.innerHTML)return;closeModal();void refreshCandidates()});
+    void importData(file).then(success=>{if(!success)return;if(modalRoot.innerHTML)closeModal();void refreshCandidates()});
   },true);
   window.addEventListener('load',()=>{
     void refreshCandidates();
