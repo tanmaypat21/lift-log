@@ -64,9 +64,28 @@ function save(){
   if(!validState(data)){alert('Workout data validation failed. No changes were written.');return false}
   try{
     const before=localStorage.getItem(KEY);
-    if(before && before!==JSON.stringify(data)){
-      try{const previous=JSON.parse(before);if(validState(previous))void window.LiftLogSafety?.capture(previous,'before change')}catch(_){}
+    if(before){
+      try{
+        const previous=JSON.parse(before);
+        if(validState(previous)){
+          const removedFrom=(name)=>{
+            const ids=new Set((data[name]||[]).map(x=>String(x.id)));
+            return (previous[name]||[]).filter(x=>!ids.has(String(x.id)));
+          };
+          const missingEntries=removedFrom('entries'),missingCardio=removedFrom('cardio');
+          const auth=window.LiftLogAuthorizedDeletion;
+          const allowed=(name,rows)=>!rows.length||
+            (rows.length===1&&auth?.type===name&&auth.id===rows[0].id);
+          if(!allowed('entries',missingEntries)||!allowed('cardio',missingCardio)){
+            const repaired=window.LiftLogSafety.merge(data,previous);
+            data=repaired.data;
+            notify('Older workout records were preserved automatically.');
+          }
+          void window.LiftLogSafety?.capture(previous,'before change');
+        }
+      }catch(_){}
     }
+    window.LiftLogAuthorizedDeletion=null;
     const serialized=JSON.stringify(data);
     localStorage.setItem(KEY,serialized);
     // A quota error in the *secondary* copy must not falsely report the primary save as failed.
@@ -292,7 +311,7 @@ window.LiftLogStorage={
   }
 };
 app.addEventListener('submit',e=>{if(e.target.id==='coachForm'){e.preventDefault();saveCoach(false)}});
-app.addEventListener('click',e=>{if(e.target.closest('#addCheckin'))return saveCoach(true);if(e.target.closest('#openCoachInterview'))return openInterview();if(e.target.closest('#openWeeklyReview'))return openWeeklyReview();if(e.target.closest('#copyCoachBrief'))return copyCoachBrief();const log=e.target.closest('[data-log]'),edit=e.target.closest('[data-edit]'),tabBtn=e.target.closest('[data-tab]'),remove=e.target.closest('[data-remove-entry]');if(log)return openLog(log.dataset.log);if(edit)return openExercise(edit.dataset.edit);if(tabBtn){tab=tabBtn.dataset.tab;render();window.scrollTo(0,0);return}if(remove){const entry=data.entries.find(x=>x.id===remove.dataset.removeEntry);if(entry&&confirm(`Delete the ${entry.date} record of ${fmt(entry.weight)} lb?`)){data.entries=data.entries.filter(x=>x.id!==entry.id);save();render();notify('Entry deleted')}return}if(e.target.closest('#addExercise'))return openExercise();if(e.target.closest('#exportJson'))return downloadFile('lift-log-backup-'+today()+'.json',JSON.stringify(data,null,2),'application/json');if(e.target.closest('#exportCsv'))return exportCsv();if(e.target.closest('#importJson'))document.querySelector('#importFile')?.click()});
+app.addEventListener('click',e=>{if(e.target.closest('#addCheckin'))return saveCoach(true);if(e.target.closest('#openCoachInterview'))return openInterview();if(e.target.closest('#openWeeklyReview'))return openWeeklyReview();if(e.target.closest('#copyCoachBrief'))return copyCoachBrief();const log=e.target.closest('[data-log]'),edit=e.target.closest('[data-edit]'),tabBtn=e.target.closest('[data-tab]'),remove=e.target.closest('[data-remove-entry]');if(log)return openLog(log.dataset.log);if(edit)return openExercise(edit.dataset.edit);if(tabBtn){tab=tabBtn.dataset.tab;render();window.scrollTo(0,0);return}if(remove){const entry=data.entries.find(x=>x.id===remove.dataset.removeEntry);if(entry&&confirm(`Delete the ${entry.date} record of ${fmt(entry.weight)} lb?`)){window.LiftLogAuthorizedDeletion={type:'entries',id:entry.id};data.entries=data.entries.filter(x=>x.id!==entry.id);if(save()){render();notify('Entry deleted (recoverable from local snapshots)')}}return}if(e.target.closest('#addExercise'))return openExercise();if(e.target.closest('#exportJson'))return downloadFile('lift-log-backup-'+today()+'.json',JSON.stringify(data,null,2),'application/json');if(e.target.closest('#exportCsv'))return exportCsv();if(e.target.closest('#importJson'))document.querySelector('#importFile')?.click()});
 app.addEventListener('change',e=>{if(e.target.id==='historyExercise'){selectedExercise=e.target.value;render()}if(e.target.id==='importFile')importData(e.target.files?.[0])});
 document.querySelector('.bottomnav').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b){tab=b.dataset.tab;render();window.scrollTo(0,0)}});
 document.querySelector('#addExerciseTop').addEventListener('click',()=>openExercise());
