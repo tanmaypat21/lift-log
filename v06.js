@@ -18,6 +18,8 @@
   let selectedJournalDate = today();
   let expandedJournalDate = null;
   let visibleJournalDays = 8;
+  let journalQuery = '';
+  let journalShowAll = false;
   let pendingLogDate = null;
   let factIndex = Math.floor(Math.random() * factList.length);
 
@@ -27,7 +29,7 @@
     ? new Date(`${value}T12:00:00`).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'})
     : String(value || 'Unknown date');
   const daysAgo = days => {const d = new Date(`${today()}T12:00:00`);d.setDate(d.getDate()-days);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
-  const workoutEntries = () => (Array.isArray(data.entries)?data.entries:[]).filter(r=>isoDate(r.date));
+  const workoutEntries = () => Array.isArray(data.entries)?data.entries:[]; // Never silently hide records with an unrecognized date.
   const cardioEntries = () => (Array.isArray(data.cardio)?data.cardio:[]).filter(r=>isoDate(r.date));
   const exerciseName = id => exById(id)?.name || 'Unlisted exercise';
   const formatNum = value => fmt(Number(value) || 0);
@@ -35,7 +37,7 @@
   function dailySessions(){
     const bucket = new Map();
     const byDate = date => {if(!bucket.has(date))bucket.set(date,{date,weights:[],cardio:[]});return bucket.get(date);};
-    workoutEntries().forEach(record=>byDate(record.date).weights.push(record));
+    workoutEntries().forEach(record=>byDate(isoDate(record.date)?record.date:'undated').weights.push(record));
     cardioEntries().forEach(record=>byDate(record.date).cardio.push(record));
     return [...bucket.values()].sort((a,b)=>b.date.localeCompare(a.date));
   }
@@ -45,7 +47,7 @@
   }
   function trendRecords(exerciseId,metric=trendMetric,period=trendWindow){
     const start = period==='all' ? null : daysAgo(Math.max(0,Number(period)-1));
-    const matching=workoutEntries().filter(r=>r.exerciseId===exerciseId && (!start||r.date>=start) && (metric==='reps'?Number(r.reps)>0:Number(r.weight)>0));
+    const matching=workoutEntries().filter(r=>isoDate(r.date)&&r.exerciseId===exerciseId && (!start||r.date>=start) && (metric==='reps'?Number(r.reps)>0:Number(r.weight)>0));
     const grouped = new Map();
     for(const entry of matching){
       const value = metric==='reps' ? (Number(entry.reps)>0?Number(entry.reps):null) : metric==='volume'
@@ -154,15 +156,71 @@
     const open=expandedJournalDate===session.date;
     return `<section class="v6-day v6-surface">${sessionHeader(session,open)}${open?`<div class="v6-day-body">${session.weights.map(loggedLift).join('')}${session.cardio.map(loggedCardio).join('')}<button type="button" class="v6-day-add" data-v6-quick-log="${escapeText(session.date)}">+ Add exercise to this day</button></div>`:''}</section>`;
   }
+  // All saved weights are displayed, even when a user has never saved a dated set.
+  function latestWeightRows(){
+    const byExercise=new Map();
+    workoutEntries().forEach((entry,index)=>{
+      const prior=byExercise.get(entry.exerciseId);
+      if(!prior||String(entry.date||'')>String(prior.entry.date||'')||
+        (String(entry.date||'')===String(prior.entry.date||'')&&index>prior.index)){
+        byExercise.set(entry.exerciseId,{entry,index});
+      }
+    });
+    const exercises=[...data.exercises];
+    for(const id of byExercise.keys()){
+      if(!exercises.some(e=>e.id===id))exercises.push({id,name:'Unlisted exercise ('+id+')',loadType:'direct',directWeight:0});
+    }
+    return exercises.map(ex=>{
+      const latest=byExercise.get(ex.id)?.entry||null;
+      const current=latest?Number(latest.weight):Number(exerciseLoad(ex))||0;
+      return {ex,latest,current};
+    }).filter(x=>x.latest||x.current>0).sort((a,b)=>{
+      const da=a.latest?.date||'',db=b.latest?.date||'';
+      return db.localeCompare(da)||a.ex.name.localeCompare(b.ex.name);
+    });
+  }
+  function weightBoard(limit=0){
+    let rows=latestWeightRows();
+    const q=journalQuery.trim().toLowerCase();
+    if(q)rows=rows.filter(x=>x.ex.name.toLowerCase().includes(q));
+    const visible=limit?rows.slice(0,limit):rows;
+    return `<section class="v6-surface v62-weight-board">
+      <div class="v6-card-head"><h2>My last working weights</h2><span class="v6-hint">${rows.length} saved movements</span></div>
+      <p class="v62-weight-explain">These are your last logged weights, or the saved starting load if you haven't logged a dated set yet.</p>
+      <div class="v62-weight-list">${visible.map(x=>`<div class="v62-weight-row">
+        <div><strong>${escapeText(x.ex.name)}</strong><small>${x.latest?'Last logged '+escapeText(readableDate(x.latest.date))+' · '+(Number(x.latest.sets)>0?x.latest.sets+' sets × '+x.latest.reps+' reps':'Sets/reps not recorded'):'Saved starting load · no dated entry'}</small></div>
+        <strong>${x.ex.id==='ab-coaster'&&x.current===0?'Bodyweight':formatNum(x.current)+' lb'}</strong>
+      </div>`).join('')||'<p class="v6-muted">No recorded weights match your search.</p>'}</div>
+      ${limit&&rows.length>limit?'<button type="button" class="v6-inline-action" data-v62-open-weights>View all weights →</button>':''}
+    </section>`;
+  }
+  function filteredSessions(){
+    const q=journalQuery.trim().toLowerCase();
+    if(!q)return dailySessions();
+    return dailySessions().map(session=>{
+      const dateMatch=session.date.toLowerCase().includes(q)||readableDate(session.date).toLowerCase().includes(q);
+      return {
+        date:session.date,
+        weights:session.weights.filter(r=>dateMatch||exerciseName(r.exerciseId).toLowerCase().includes(q)||(r.notes||'').toLowerCase().includes(q)),
+        cardio:session.cardio.filter(r=>dateMatch||String(r.type||'').toLowerCase().includes(q)||(r.notes||'').toLowerCase().includes(q))
+      };
+    }).filter(s=>s.weights.length||s.cardio.length);
+  }
   function journalPage(){
-    const sessions=dailySessions();
-    if(expandedJournalDate===null&&sessions.length)expandedJournalDate=sessions[0].date;
-    return `<div class="v6-page v6-journal"><div class="v6-heading"><span class="v6-eyebrow">TRAINING JOURNAL</span><h1>Every workout, in order<span class="v6-period">.</span></h1><p>Review the day, find your exercises, and log your next session.</p></div>
+    const all=dailySessions(),sessions=filteredSessions();
+    if(sessions.length&&!sessions.some(s=>s.date===expandedJournalDate))expandedJournalDate=sessions[0].date;
+    const shown=journalShowAll?sessions:sessions.slice(0,visibleJournalDays);
+    return `<div class="v6-page v6-journal">
+      <div class="v6-heading"><span class="v6-eyebrow">TRAINING JOURNAL · FULL HISTORY</span>
+        <h1>Find any previous workout<span class="v6-period">.</span></h1>
+        <p>${workoutEntries().length} strength entries across ${all.length} dates, plus ${cardioEntries().length} cardio sessions. Nothing is hidden by a recent-date cutoff.</p></div>
       <div class="v6-journal-toolbar v6-surface"><label class="v6-field">Log for date<input id="v6JournalDate" type="date" value="${escapeText(selectedJournalDate)}" /></label><button type="button" class="v6-button" data-v6-quick-log="${escapeText(selectedJournalDate)}">+ Log exercise</button></div>
-      <div class="v6-section-title"><h2>Training history</h2><span>${sessions.length} recorded ${sessions.length===1?'day':'days'}</span></div>
-      ${sessions.length?sessions.slice(0,visibleJournalDays).map(dayCard).join(''):`<div class="v6-empty v6-surface"><strong>No entries yet</strong><p>Start by logging a lift. Each date will become its own workout card.</p></div>`}
-      ${sessions.length>visibleJournalDays?`<button class="v6-more" data-v6-more-days type="button">Show older training days (${sessions.length-visibleJournalDays})</button>`:''}
-      <p class="v6-journal-footer">Entries are grouped using the dates you logged. Your existing records haven't been changed.</p>
+      <label class="v6-field v62-search-field">Search all workouts and weights<input id="v62JournalSearch" type="search" value="${escapeText(journalQuery)}" placeholder="Leg press, preacher curl, date, notes…" autocomplete="off"/></label>
+      ${weightBoard()}
+      <div class="v6-section-title"><h2>Every training day</h2><span>${sessions.length} of ${all.length} dates</span></div>
+      ${shown.length?shown.map(dayCard).join(''):`<div class="v6-empty v6-surface"><strong>No matching workouts</strong><p>Try another search or recover a previous JSON backup from Settings.</p></div>`}
+      ${sessions.length>shown.length?`<button type="button" class="v6-more" data-v62-all-days>Show all ${sessions.length} training days</button>`:''}
+      <p class="v6-journal-footer">Workout entries remain grouped by their recorded date. Use Edit to fix a weight, date, set count, or notes.</p>
     </div>`;
   }
   function quickLog(date) {
