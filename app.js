@@ -37,7 +37,7 @@ let data=(()=>{
 })();
 // Backward-compatible update for data created with the first prototype. Never re-seed if removed later.
 if(!data.migrations?.legCurl20261117){
-  if(!data.exercises.some(e=>e.id==='leg-curl')){
+  if(data.entries.some(e=>e.id==='seed-leg'||e.id==='seed-calf')&&!data.exercises.some(e=>e.id==='leg-curl')){
     data.exercises.push(copy(initial.exercises.find(e=>e.id==='leg-curl')));
     data.entries.push(copy(initial.entries.find(e=>e.id==='seed-curl')));
   }
@@ -250,7 +250,7 @@ async function copyCoachBrief(){
  openModal(`${modalTop('Your coaching brief','Copy this text to ChatGPT yourself. It is not sent automatically.')}<div class="field"><textarea id="briefText" rows="12" readonly>${esc(brief)}</textarea></div><button id="selectBrief" class="primary full">Select all text</button>`);
  modalRoot.querySelector('#selectBrief').addEventListener('click',()=>modalRoot.querySelector('#briefText').select());
 }
-function settings(){return `${heading('Your data.','Your workouts belong to you.')}<div class="card"><div class="section-header" style="margin-top:0"><h2>Backup and export</h2></div><p class="settings-p">Records are saved on this device in your browser. They do not automatically sync with ChatGPT or another device. Back up your data before clearing browser storage.</p><div class="btnrow"><button class="primary" id="exportJson">Export JSON backup</button><button class="secondary" id="exportCsv">Export CSV</button><button class="secondary" id="importJson">Import JSON</button><input id="importFile" class="file-input" type="file" accept=".json,application/json"></div></div><div class="card"><h2 style="font-size:17px">About load calculations</h2><p class="settings-p">For plate-loaded machines, the app calculates plate load only. When <strong>per side</strong> is selected, it doubles the plates you enter. A sled, lever, carriage, or other machine starting resistance is <strong>not</strong> included. For barbell lifts, use direct weight including the bar.</p><p class="settings-p">Your initial entries were entered on November 17, 2026. Calf raises are provisionally treated as 2 × 45 lb total rather than per side.</p></div><div class="card"><h2 style="font-size:17px">Future improvements</h2><p class="settings-p">Workout templates, warm-up tracking, progressive overload suggestions, cloud sync, and app-store release can be added after using the prototype.</p></div>`}
+function settings(){return `${heading('Your data.','Your workouts belong to you.')}<div class="card"><div class="section-header" style="margin-top:0"><h2>Backup and export</h2></div><p class="settings-p">Records are saved on this device in your browser. They do not automatically sync with ChatGPT or another device. Back up your data before clearing browser storage.</p><div class="btnrow"><button class="primary" id="exportJson">Export JSON backup</button><button class="secondary" id="exportCsv">Export CSV</button><button class="secondary" id="importJson">Merge JSON backup</button><input id="importFile" class="file-input" type="file" accept=".json,application/json"></div></div><div class="card"><h2 style="font-size:17px">About load calculations</h2><p class="settings-p">For plate-loaded machines, the app calculates plate load only. When <strong>per side</strong> is selected, it doubles the plates you enter. A sled, lever, carriage, or other machine starting resistance is <strong>not</strong> included. For barbell lifts, use direct weight including the bar.</p><p class="settings-p">Your initial entries were entered on November 17, 2026. Calf raises are provisionally treated as 2 × 45 lb total rather than per side.</p></div><div class="card"><h2 style="font-size:17px">Future improvements</h2><p class="settings-p">Workout templates, warm-up tracking, progressive overload suggestions, cloud sync, and app-store release can be added after using the prototype.</p></div>`}
 function render(){app.innerHTML=({home,exercises,history,coach,settings}[tab]||home)();document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab))}
 function openModal(html){modalRoot.innerHTML=`<div class="modal-backdrop" id="backdrop"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`;document.body.style.overflow='hidden';document.querySelector('#backdrop').addEventListener('click',e=>{if(e.target.id==='backdrop')closeModal()});document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',closeModal))}
 function closeModal(){modalRoot.innerHTML='';editorState=null;document.body.style.overflow=''}
@@ -272,9 +272,12 @@ async function importData(file){
     const {data:merged,added}=window.LiftLogSafety.merge(data,payload);
     const found=Object.entries(added).map(([k,v])=>k+': '+v).join(' · ');
     if(!confirm('Merge this backup WITHOUT deleting your current records? New items: '+found))return;
-    if(dataRecoveryBlocked){dataRecoveryBlocked=false;}
+    const original=data,wasBlocked=dataRecoveryBlocked;
+    dataRecoveryBlocked=false;
     data=merged;
-    if(save()){render();notify('Backup merged safely. Your recent entries are kept.')}
+    if(save()){render();notify('Backup merged safely. Your recent entries are kept.');return true;}
+    data=original;dataRecoveryBlocked=wasBlocked;
+    return false;
   }catch(e){alert('Import failed. Existing data was not changed: '+e.message)}
 }
 window.LiftLogStorage={
