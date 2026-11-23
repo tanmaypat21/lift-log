@@ -80,7 +80,7 @@ function save(){
 }
 function notify(message){const el=document.querySelector('#toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2800)}
 function exById(id){return data.exercises.find(e=>e.id===id)}
-function entriesFor(id){return data.entries.filter(e=>e.exerciseId===id).sort((a,b)=>b.date.localeCompare(a.date))}
+function entriesFor(id){return data.entries.map((entry,index)=>({entry,index})).filter(x=>x.entry.exerciseId===id).sort((a,b)=>String(b.entry.date||'').localeCompare(String(a.entry.date||''))||b.index-a.index).map(x=>x.entry)}
 function recent(id){return entriesFor(id)[0]}
 function plateWeight(plates,perSide){return Object.entries(plates||{}).reduce((s,[size,count])=>s+Number(size)*Number(count||0),0)*(perSide?2:1)}
 function exerciseLoad(ex){if(ex.loadType==='direct')return Number(ex.directWeight)||0;return plateWeight(ex.plates,ex.perSide)}
