@@ -77,6 +77,10 @@ function save(){
           const allowed=(name,rows)=>!rows.length||
             (rows.length===1&&auth?.type===name&&auth.id===rows[0].id);
           if(!allowed('entries',missingEntries)||!allowed('cardio',missingCardio)){
+            if(!window.LiftLogSafety?.merge){
+              alert('Save blocked to protect older workout records. Recovery service unavailable; reopen the app while online.');
+              return false;
+            }
             const repaired=window.LiftLogSafety.merge(data,previous);
             data=repaired.data;
             notify('Older workout records were preserved automatically.');
